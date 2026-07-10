@@ -4,6 +4,9 @@ void main() {
   runApp(const MainApp());
 }
 
+// =====================================================================
+// ROOT APP COMPONENT
+// =====================================================================
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
@@ -11,11 +14,14 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomeScreen(),
+      home: HomeScreen(), // Sets the initial screen
     );
   }
 }
 
+// =====================================================================
+// HOME SCREEN (Stateful to handle Grid vs List toggle)
+// =====================================================================
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -24,38 +30,49 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // Acts as the memory for our toggle button. False = List, True = Grid.
   bool isgrid = false;
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      bottom: false, 
+      bottom: false, // Allows the body to scroll behind the floating nav bar
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8F9FA),
-        extendBody: true,
+        backgroundColor: const Color(0xFFF8F9FA), // Light grey background
+        extendBody: true, // Crucial for making the bottom nav bar float
+        
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start, 
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 15),
+              
+              // Top Profile Card & Search Bar
               const CardExample(),
               const SizedBox(height: 15),
               const SearchBarApp(),
               const SizedBox(height: 30),
-              
+
+              // --- HEADER ROW (Title + Toggle Button) ---
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Select your next trip', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold), textAlign: TextAlign.left, textDirection: .ltr),
-                  const Spacer(),
+                  const Text(
+                    'Select your next trip',
+                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.left,
+                    textDirection: TextDirection.ltr,
+                  ),
+                  const Spacer(), // Pushes the button to the far right
                   
+                  // The Toggle Button
                   FilledButton(
                     onPressed: () {
                       setState(() {
-                        isgrid = !isgrid;
+                        isgrid = !isgrid; // Flips between true/false
                       });
                     },
                     style: ElevatedButton.styleFrom(
@@ -63,15 +80,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.all(8),
                       backgroundColor: Colors.black,
                     ),
+                    // Changes icon dynamically based on current state
                     child: Icon(isgrid ? Icons.list : Icons.grid_view),
                   ),
-                ]
+                ],
               ),
-              
+
               const SizedBox(height: 5),
-              
+
+              // --- HORIZONTAL CATEGORY TABS ---
               SizedBox(
-                height: 50,
+                height: 50, // Fixed height prevents horizontal list from crashing
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   children: const [
@@ -85,14 +104,17 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
 
               const SizedBox(height: 15),
-              
+
+              // --- DYNAMIC CONTENT AREA (List View OR Grid View) ---
+              // Expanded forces this section to fill the remaining screen space
               Expanded(
-                child: isgrid 
-                    ? const GridViewOption() 
-                    : ListView(
+                child: isgrid
+                    ? const GridViewOption() // IF TRUE: Show Grid
+                    : ListView(              // IF FALSE: Show List
+                        // Adds large bottom padding so the last item isn't trapped behind nav bar
                         padding: const EdgeInsets.only(bottom: 120, top: 16),
                         children: <Widget>[
-                          
+                          // 1. Iceland
                           DestinationCard(
                             imageUrl: 'https://ik.imagekit.io/travalot/development/resources/attachments/2025/11/12/8fbd8b80-d71e-11f0-b871-9729adfa2385.jpg?tr=w-1600,h-1067,c-at_max:f-webp:q-85',
                             title: 'Iceland',
@@ -103,23 +125,24 @@ class _HomeScreenState extends State<HomeScreen> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => const DestinationDetailScreen(
-                                      headerImageUrl: 'https://ik.imagekit.io/travalot/development/resources/attachments/2025/11/12/8fbd8b80-d71e-11f0-b871-9729adfa2385.jpg?tr=w-1600,h-1067,c-at_max:f-webp:q-85',
-                                      cityName: 'Reykjavik',
-                                      countryName: 'Iceland', 
-                                      rating: '4.9/5', 
-                                      reviewCount: '187 reviews', 
-                                      description: 'Discover Iceland, a breathtaking blend of glaciers, volcanoes, geysers, and the Northern Lights. Walk along black sand beaches, rela...', 
-                                      featuredTourTitle: 'Fire & Ice Trip' ,
-                                      featuredTourDuration: '6 Days 5 Nights' , 
-                                      featuredTourPrice: '630 USD', 
-                                      featuredTourPersonText: 'for 1 Person',
-                                      featuredTourImageUrl: 'https://ik.imagekit.io/travalot/development/resources/attachments/2025/11/12/8fbd8b80-d71e-11f0-b871-9729adfa2385.jpg?tr=w-1600,h-1067,c-at_max:f-webp:q-85'
+                                    headerImageUrl: 'https://ik.imagekit.io/travalot/development/resources/attachments/2025/11/12/8fbd8b80-d71e-11f0-b871-9729adfa2385.jpg?tr=w-1600,h-1067,c-at_max:f-webp:q-85',
+                                    cityName: 'Reykjavik',
+                                    countryName: 'Iceland',
+                                    rating: '4.9/5',
+                                    reviewCount: '187 reviews',
+                                    description: 'Discover Iceland, a breathtaking blend of glaciers, volcanoes, geysers, and the Northern Lights. Walk along black sand beaches, rela...',
+                                    featuredTourTitle: 'Fire & Ice Trip',
+                                    featuredTourDuration: '6 Days 5 Nights',
+                                    featuredTourPrice: '630 USD',
+                                    featuredTourPersonText: 'for 1 Person',
+                                    featuredTourImageUrl: 'https://ik.imagekit.io/travalot/development/resources/attachments/2025/11/12/8fbd8b80-d71e-11f0-b871-9729adfa2385.jpg?tr=w-1600,h-1067,c-at_max:f-webp:q-85',
                                   ),
                                 ),
                               );
                             },
                           ),
 
+                          // 2. Scotland
                           DestinationCard(
                             imageUrl: 'https://images.ctfassets.net/rc3dlxapnu6k/5gU2tKCncSVhSKGLZuhocq/f862b40488d9ec4f6246a17ac7f9f5c2/Schottland__Glenfinnan_Viaduct-2.jpg?w=800&q=60&fm=webp',
                             title: 'Scotland',
@@ -130,23 +153,24 @@ class _HomeScreenState extends State<HomeScreen> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => const DestinationDetailScreen(
-                                      headerImageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTp41nKHB9_oK4GBlBE49YPWDp9hXNZ8nmht_ytyf5U9CepTfS1fVVrvfc&s=10',
-                                      cityName: 'Highlands',
-                                      countryName: 'Scotland', 
-                                      rating: '4.8/5', 
-                                      reviewCount: '240 reviews', 
-                                      description: 'Experience the rugged beauty of the Scottish Highlands. Visit historic castles, sail across mysterious lochs, and ride the famous Jacobite steam train.', 
-                                      featuredTourTitle: 'Loch Ness Tour' ,
-                                      featuredTourDuration: '3 Days 2 Nights' , 
-                                      featuredTourPrice: '250 USD', 
-                                      featuredTourPersonText: 'for 1 Person',
-                                      featuredTourImageUrl: 'https://images.ctfassets.net/rc3dlxapnu6k/5gU2tKCncSVhSKGLZuhocq/f862b40488d9ec4f6246a17ac7f9f5c2/Schottland__Glenfinnan_Viaduct-2.jpg?w=800&q=60&fm=webp'
+                                    headerImageUrl: 'https://images.ctfassets.net/rc3dlxapnu6k/5gU2tKCncSVhSKGLZuhocq/f862b40488d9ec4f6246a17ac7f9f5c2/Schottland__Glenfinnan_Viaduct-2.jpg?w=800&q=60&fm=webp',
+                                    cityName: 'Highlands',
+                                    countryName: 'Scotland',
+                                    rating: '4.8/5',
+                                    reviewCount: '240 reviews',
+                                    description: 'Experience the rugged beauty of the Scottish Highlands. Visit historic castles, sail across mysterious lochs, and ride the famous Jacobite steam train.',
+                                    featuredTourTitle: 'Loch Ness Tour',
+                                    featuredTourDuration: '3 Days 2 Nights',
+                                    featuredTourPrice: '250 USD',
+                                    featuredTourPersonText: 'for 1 Person',
+                                    featuredTourImageUrl: 'https://images.ctfassets.net/rc3dlxapnu6k/5gU2tKCncSVhSKGLZuhocq/f862b40488d9ec4f6246a17ac7f9f5c2/Schottland__Glenfinnan_Viaduct-2.jpg?w=800&q=60&fm=webp',
                                   ),
                                 ),
                               );
-                            }
+                            },
                           ),
 
+                          // 3. Gilgit Baltistan
                           DestinationCard(
                             imageUrl: 'https://www.arabnews.pk/sites/default/files/styles/n_670_395/public/2025/01/03/4560177-1578019235.jpg?itok=wnu_fCIT',
                             title: 'Gilgit Baltistan',
@@ -157,24 +181,24 @@ class _HomeScreenState extends State<HomeScreen> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => const DestinationDetailScreen(
-                                      headerImageUrl: 'https://www.arabnews.pk/sites/default/files/styles/n_670_395/public/2025/01/03/4560177-1578019235.jpg?itok=wnu_fCIT',
-                                      cityName: 'Hunza Valley',
-                                      countryName: 'Gilgit Baltistan', 
-                                      rating: '4.9/5', 
-                                      reviewCount: '312 reviews', 
-                                      description: 'Explore the majestic peaks of the Karakoram. Walk among the vibrant autumn leaves, visit ancient forts, and meet the incredibly hospitable locals.', 
-                                      featuredTourTitle: 'Fairy Meadows' ,
-                                      featuredTourDuration: '7 Days 6 Nights' , 
-                                      featuredTourPrice: '450 USD', 
-                                      featuredTourPersonText: 'for 1 Person',
-                                      featuredTourImageUrl: 'https://www.arabnews.pk/sites/default/files/styles/n_670_395/public/2025/01/03/4560177-1578019235.jpg?itok=wnu_fCIT'
+                                    headerImageUrl: 'https://www.arabnews.pk/sites/default/files/styles/n_670_395/public/2025/01/03/4560177-1578019235.jpg?itok=wnu_fCIT',
+                                    cityName: 'Hunza Valley',
+                                    countryName: 'Gilgit Baltistan',
+                                    rating: '4.9/5',
+                                    reviewCount: '312 reviews',
+                                    description: 'Explore the majestic peaks of the Karakoram. Walk among the vibrant autumn leaves, visit ancient forts, and meet the incredibly hospitable locals.',
+                                    featuredTourTitle: 'Fairy Meadows',
+                                    featuredTourDuration: '7 Days 6 Nights',
+                                    featuredTourPrice: '450 USD',
+                                    featuredTourPersonText: 'for 1 Person',
+                                    featuredTourImageUrl: 'https://www.arabnews.pk/sites/default/files/styles/n_670_395/public/2025/01/03/4560177-1578019235.jpg?itok=wnu_fCIT',
                                   ),
                                 ),
                               );
-                            }
+                            },
                           ),
 
-                          // --- MYANMAR ---
+                          // 4. Myanmar
                           DestinationCard(
                             imageUrl: 'https://cdn.kimkim.com/files/a/content_articles/featured_photos/a1317e3c775ca06fb05848852ba24b5d4344ee6a/big-45c4c417598f0104f1d4c7262dedf921.jpg',
                             title: 'Myanmar',
@@ -185,24 +209,24 @@ class _HomeScreenState extends State<HomeScreen> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => const DestinationDetailScreen(
-                                      headerImageUrl: 'https://cdn.kimkim.com/files/a/content_articles/featured_photos/a1317e3c775ca06fb05848852ba24b5d4344ee6a/big-45c4c417598f0104f1d4c7262dedf921.jpg',
-                                      cityName: 'Bagan',
-                                      countryName: 'Myanmar', 
-                                      rating: '4.6/5', 
-                                      reviewCount: '145 reviews', 
-                                      description: 'Discover thousands of ancient Buddhist temples scattered across the plains of Bagan. Take a sunrise hot air balloon ride for a once-in-a-lifetime view.', 
-                                      featuredTourTitle: 'Temple Tour' ,
-                                      featuredTourDuration: '10 Days 9 Nights' , 
-                                      featuredTourPrice: '350 USD', 
-                                      featuredTourPersonText: 'for 1 Person',
-                                      featuredTourImageUrl: 'https://cdn.kimkim.com/files/a/content_articles/featured_photos/a1317e3c775ca06fb05848852ba24b5d4344ee6a/big-45c4c417598f0104f1d4c7262dedf921.jpg'
+                                    headerImageUrl: 'https://cdn.kimkim.com/files/a/content_articles/featured_photos/a1317e3c775ca06fb05848852ba24b5d4344ee6a/big-45c4c417598f0104f1d4c7262dedf921.jpg',
+                                    cityName: 'Bagan',
+                                    countryName: 'Myanmar',
+                                    rating: '4.6/5',
+                                    reviewCount: '145 reviews',
+                                    description: 'Discover thousands of ancient Buddhist temples scattered across the plains of Bagan. Take a sunrise hot air balloon ride for a once-in-a-lifetime view.',
+                                    featuredTourTitle: 'Temple Tour',
+                                    featuredTourDuration: '10 Days 9 Nights',
+                                    featuredTourPrice: '350 USD',
+                                    featuredTourPersonText: 'for 1 Person',
+                                    featuredTourImageUrl: 'https://cdn.kimkim.com/files/a/content_articles/featured_photos/a1317e3c775ca06fb05848852ba24b5d4344ee6a/big-45c4c417598f0104f1d4c7262dedf921.jpg',
                                   ),
                                 ),
                               );
-                            }
+                            },
                           ),
 
-                          // --- NEW ZEALAND ---
+                          // 5. New Zealand
                           DestinationCard(
                             imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRADpXUik5v4_oyeJPbggxSg7YhVuyuXeJc7pMxAdZsCdwkoT4xuhmGSBRQ&s=10',
                             title: 'New Zealand',
@@ -213,21 +237,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => const DestinationDetailScreen(
-                                      headerImageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRADpXUik5v4_oyeJPbggxSg7YhVuyuXeJc7pMxAdZsCdwkoT4xuhmGSBRQ&s=10',
-                                      cityName: 'Queenstown',
-                                      countryName: 'New Zealand', 
-                                      rating: '5.0/5', 
-                                      reviewCount: '500+ reviews', 
-                                      description: 'The adventure capital of the world! Bungee jump off historic bridges, cruise through Milford Sound, and hike the stunning trails of the South Island.', 
-                                      featuredTourTitle: 'Milford Sound' ,
-                                      featuredTourDuration: '14 Days 13 Nights' , 
-                                      featuredTourPrice: '900 USD', 
-                                      featuredTourPersonText: 'for 1 Person',
-                                      featuredTourImageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRADpXUik5v4_oyeJPbggxSg7YhVuyuXeJc7pMxAdZsCdwkoT4xuhmGSBRQ&s=10'
+                                    headerImageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRADpXUik5v4_oyeJPbggxSg7YhVuyuXeJc7pMxAdZsCdwkoT4xuhmGSBRQ&s=10',
+                                    cityName: 'Queenstown',
+                                    countryName: 'New Zealand',
+                                    rating: '5.0/5',
+                                    reviewCount: '500+ reviews',
+                                    description: 'The adventure capital of the world! Bungee jump off historic bridges, cruise through Milford Sound, and hike the stunning trails of the South Island.',
+                                    featuredTourTitle: 'Milford Sound',
+                                    featuredTourDuration: '14 Days 13 Nights',
+                                    featuredTourPrice: '900 USD',
+                                    featuredTourPersonText: 'for 1 Person',
+                                    featuredTourImageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRADpXUik5v4_oyeJPbggxSg7YhVuyuXeJc7pMxAdZsCdwkoT4xuhmGSBRQ&s=10',
                                   ),
                                 ),
                               );
-                            }
+                            },
                           ),
                         ],
                       ),
@@ -241,6 +265,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+// =====================================================================
+// BOTTOM NAVIGATION BAR
+// =====================================================================
 class NavigationExample extends StatefulWidget {
   const NavigationExample({super.key});
 
@@ -254,16 +281,18 @@ class _NavigationExampleState extends State<NavigationExample> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 30, right: 30, bottom: 25), 
+      // Padding pushes the bar away from the edges to make it float
+      padding: const EdgeInsets.only(left: 30, right: 30, bottom: 25),
       child: ClipRRect(
         borderRadius: const BorderRadius.all(Radius.circular(50.0)),
         child: NavigationBar(
-          height: 70, 
-          backgroundColor: Colors.white, 
-          surfaceTintColor: Colors.transparent, 
-          labelBehavior: NavigationDestinationLabelBehavior.alwaysHide, 
+          height: 70,
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent, // Prevents material tinting
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysHide, // Centers the icons perfectly
           
-          indicatorColor: Colors.transparent, 
+          // We make the default indicator invisible to use our custom Container below
+          indicatorColor: Colors.transparent,
           
           onDestinationSelected: (int index) {
             setState(() {
@@ -272,28 +301,26 @@ class _NavigationExampleState extends State<NavigationExample> {
           },
           selectedIndex: currentPageIndex,
           destinations: <Widget>[
-            
-            // --- 1. HOME ---
+            // 1. Home
             NavigationDestination(
-              icon: const Icon(Icons.home_outlined, size: 32.0, color: Colors.black), 
-              
+              icon: const Icon(Icons.home_outlined, size: 32.0, color: Colors.black),
               selectedIcon: Container(
-                width: 55, // 💡 Increase or decrease this to change the circle size
+                width: 55,
                 height: 55,
                 decoration: const BoxDecoration(
-                  color: Color(0xFFEE455D), // Pink color moved here!
+                  color: Color(0xFFEE455D), // Pink highlight color
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.home, size: 32.0, color: Colors.white), 
+                child: const Icon(Icons.home, size: 32.0, color: Colors.white),
               ),
               label: '',
             ),
             
-            // --- 2. CALENDAR ---
+            // 2. Calendar
             NavigationDestination(
               icon: const Icon(Icons.calendar_today_outlined, size: 28.0, color: Colors.black),
               selectedIcon: Container(
-                width: 55, 
+                width: 55,
                 height: 55,
                 decoration: const BoxDecoration(color: Color(0xFFEE455D), shape: BoxShape.circle),
                 child: const Icon(Icons.calendar_today, size: 28.0, color: Colors.white),
@@ -301,11 +328,11 @@ class _NavigationExampleState extends State<NavigationExample> {
               label: '',
             ),
             
-            // --- 3. FAVORITE ---
+            // 3. Favorites
             NavigationDestination(
               icon: const Icon(Icons.favorite_border, size: 32.0, color: Colors.black),
               selectedIcon: Container(
-                width: 55, 
+                width: 55,
                 height: 55,
                 decoration: const BoxDecoration(color: Color(0xFFEE455D), shape: BoxShape.circle),
                 child: const Icon(Icons.favorite, size: 32.0, color: Colors.white),
@@ -313,11 +340,11 @@ class _NavigationExampleState extends State<NavigationExample> {
               label: '',
             ),
             
-            // --- 4. GRID / DASHBOARD ---
+            // 4. Dashboard/Grid
             NavigationDestination(
               icon: const Icon(Icons.grid_view_outlined, size: 32.0, color: Colors.black),
               selectedIcon: Container(
-                width: 55, 
+                width: 55,
                 height: 55,
                 decoration: const BoxDecoration(color: Color(0xFFEE455D), shape: BoxShape.circle),
                 child: const Icon(Icons.grid_view, size: 32.0, color: Colors.white),
@@ -331,27 +358,30 @@ class _NavigationExampleState extends State<NavigationExample> {
   }
 }
 
+// =====================================================================
+// TOP UI COMPONENTS (Profile Header & Search Bar)
+// =====================================================================
 class CardExample extends StatelessWidget {
   const CardExample({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          ListTile(
-            leading: const Icon(Icons.account_circle, size: 40),
-            title: const Text('Hello, Beatrice', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-            subtitle: const Text('Welcome to TripGlide', style: TextStyle(color: Colors.grey)),
-            trailing: FloatingActionButton.small(
-              onPressed: () {}, 
-              backgroundColor: Colors.white,
-              elevation: 0,
-              child: const Icon(Icons.menu, color: Colors.black,),
-            ),
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        ListTile(
+          leading: const Icon(Icons.account_circle, size: 40),
+          title: const Text('Hello, Beatrice', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+          subtitle: const Text('Welcome to TripGlide', style: TextStyle(color: Colors.grey)),
+          trailing: FloatingActionButton.small(
+            onPressed: () {},
+            backgroundColor: Colors.white,
+            elevation: 0,
+            child: const Icon(Icons.menu, color: Colors.black),
           ),
-        ],
-      );
+        ),
+      ],
+    );
   }
 }
 
@@ -377,79 +407,103 @@ class _SearchBarAppState extends State<SearchBarApp> {
           onPressed: () {},
         ),
       ],
-    ); 
-  }      
+    );
+  }
 }
 
+// =====================================================================
+// DESTINATION CARD WIDGET (Reusable for Grid & List views)
+// =====================================================================
 class DestinationCard extends StatelessWidget {
   final String imageUrl;
   final String title;
   final String duration;
   final String price;
-  final bool isGrid; 
-  final VoidCallback onTap; 
+  final bool isGrid; // Used to shrink dimensions when placed in a grid
+  final VoidCallback onTap;
 
   const DestinationCard({
-    super.key, 
-    required this.imageUrl, 
-    required this.title, 
-    required this.duration, 
+    super.key,
+    required this.imageUrl,
+    required this.title,
+    required this.duration,
     required this.price,
     required this.onTap,
-    this.isGrid = false, 
+    this.isGrid = false, // Defaults to List View sizing
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      // Dynamic height based on view type
       height: isGrid ? 180 : 220,
       width: double.infinity,
+      // GridView provides its own spacing, so we only need margin in ListView
       margin: isGrid ? EdgeInsets.zero : const EdgeInsets.only(bottom: 15),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: Stack(
           children: [
+            // Background Image
             Image.network(imageUrl, fit: BoxFit.cover, width: double.infinity, height: double.infinity),
             
+            // Tappable InkWell Layer
             Positioned.fill(
               child: Material(
-                color: Colors.transparent,
+                color: Colors.transparent, // Invisible material to hold the ripple effect
                 child: InkWell(
-                  onTap: onTap, 
+                  onTap: onTap,
                 ),
               ),
             ),
             
+            // Top-Right Arrow Button
             Positioned(
-              top: 12, right: 12,
+              top: 12,
+              right: 12,
               child: CircleAvatar(
-                backgroundColor: Colors.white, 
+                backgroundColor: Colors.white,
                 radius: isGrid ? 14 : 18,
                 child: IconButton(
-                  padding: EdgeInsets.zero, 
+                  padding: EdgeInsets.zero,
                   icon: Icon(Icons.north_east, color: Colors.black, size: isGrid ? 14 : 20),
-                  onPressed: onTap, 
+                  onPressed: onTap,
                 ),
               ),
             ),
             
+            // Location Title
             Positioned(
-              bottom: 16, left: 16,
-              child: Text(title, style: TextStyle(color: Colors.white, fontSize: isGrid ? 18 : 28, fontWeight: FontWeight.bold)),
+              bottom: 16,
+              left: 16,
+              child: Text(
+                title,
+                style: TextStyle(color: Colors.white, fontSize: isGrid ? 18 : 28, fontWeight: FontWeight.bold),
+              ),
             ),
             
+            // Price Tag
             Positioned(
-              bottom: 16, right: 16,
-              child: Text(price, style: TextStyle(color: Colors.white, fontSize: isGrid ? 14 : 20, fontWeight: FontWeight.bold)),
+              bottom: 16,
+              right: 16,
+              child: Text(
+                price,
+                style: TextStyle(color: Colors.white, fontSize: isGrid ? 14 : 20, fontWeight: FontWeight.bold),
+              ),
             ),
             
+            // Duration Pill
             Positioned(
-              top: 16, left: 16,
+              top: 16,
+              left: 16,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
-                child: Text(duration, style: TextStyle(color: Colors.black, fontSize: isGrid ? 10 : 14, fontWeight: FontWeight.bold)),
-              )
+                child: Text(
+                  duration,
+                  style: TextStyle(color: Colors.black, fontSize: isGrid ? 10 : 14, fontWeight: FontWeight.bold),
+                ),
+              ),
             ),
           ],
         ),
@@ -458,145 +512,178 @@ class DestinationCard extends StatelessWidget {
   }
 }
 
+// =====================================================================
+// GRID VIEW LAYOUT COMPONENT
+// =====================================================================
 class GridViewOption extends StatelessWidget {
   const GridViewOption({super.key});
-  
+
   @override
   Widget build(BuildContext context) {
     return GridView.count(
       padding: const EdgeInsets.only(bottom: 120, top: 16),
       primary: false,
-      crossAxisSpacing: 10, 
-      mainAxisSpacing: 10, 
+      crossAxisSpacing: 10,
+      mainAxisSpacing: 10,
       crossAxisCount: 2,
+      // 0.85 ratio makes the grid cards slightly taller than they are wide
       childAspectRatio: 0.85,
       children: <Widget>[
-        // --- ICELAND (GRID) ---
+        // 1. Iceland
         DestinationCard(
-          isGrid: true,
+          isGrid: true, // Shrinks fonts and dimensions to fit
           imageUrl: 'https://ik.imagekit.io/travalot/development/resources/attachments/2025/11/12/8fbd8b80-d71e-11f0-b871-9729adfa2385.jpg?tr=w-1600,h-1067,c-at_max:f-webp:q-85',
-          title: 'Iceland', duration: '6 days 5 nights', price: '\$630',
+          title: 'Iceland',
+          duration: '6 days 5 nights',
+          price: '\$630',
           onTap: () {
-            Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const DestinationDetailScreen(
-                headerImageUrl: 'https://ik.imagekit.io/travalot/development/resources/attachments/2025/11/12/8fbd8b80-d71e-11f0-b871-9729adfa2385.jpg?tr=w-1600,h-1067,c-at_max:f-webp:q-85',
-                cityName: 'Reykjavik',
-                countryName: 'Iceland', 
-                rating: '4.9/5', 
-                reviewCount: '187 reviews', 
-                description: 'Discover Iceland, a breathtaking blend of glaciers, volcanoes, geysers, and the Northern Lights. Walk along black sand beaches, rela...', 
-                featuredTourTitle: 'Fire & Ice Trip',
-                featuredTourDuration: '6 Days 5 Nights', 
-                featuredTourPrice: '630 USD', 
-                featuredTourPersonText: 'for 1 Person',
-                featuredTourImageUrl: 'https://ik.imagekit.io/travalot/development/resources/attachments/2025/11/12/8fbd8b80-d71e-11f0-b871-9729adfa2385.jpg?tr=w-1600,h-1067,c-at_max:f-webp:q-85'
-                )),
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const DestinationDetailScreen(
+                  headerImageUrl: 'https://ik.imagekit.io/travalot/development/resources/attachments/2025/11/12/8fbd8b80-d71e-11f0-b871-9729adfa2385.jpg?tr=w-1600,h-1067,c-at_max:f-webp:q-85',
+                  cityName: 'Reykjavik',
+                  countryName: 'Iceland',
+                  rating: '4.9/5',
+                  reviewCount: '187 reviews',
+                  description: 'Discover Iceland, a breathtaking blend of glaciers, volcanoes, geysers, and the Northern Lights. Walk along black sand beaches, rela...',
+                  featuredTourTitle: 'Fire & Ice Trip',
+                  featuredTourDuration: '6 Days 5 Nights',
+                  featuredTourPrice: '630 USD',
+                  featuredTourPersonText: 'for 1 Person',
+                  featuredTourImageUrl: 'https://ik.imagekit.io/travalot/development/resources/attachments/2025/11/12/8fbd8b80-d71e-11f0-b871-9729adfa2385.jpg?tr=w-1600,h-1067,c-at_max:f-webp:q-85',
+                ),
+              ),
             );
           },
         ),
 
-        // --- SCOTLAND (GRID) ---
+        // 2. Scotland
         DestinationCard(
           isGrid: true,
           imageUrl: 'https://images.ctfassets.net/rc3dlxapnu6k/5gU2tKCncSVhSKGLZuhocq/f862b40488d9ec4f6246a17ac7f9f5c2/Schottland__Glenfinnan_Viaduct-2.jpg?w=800&q=60&fm=webp',
-          title: 'Scotland', duration: '5 days 4 nights', price: '\$250',
+          title: 'Scotland',
+          duration: '5 days 4 nights',
+          price: '\$250',
           onTap: () {
-            Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const DestinationDetailScreen(
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const DestinationDetailScreen(
                   headerImageUrl: 'https://images.ctfassets.net/rc3dlxapnu6k/5gU2tKCncSVhSKGLZuhocq/f862b40488d9ec4f6246a17ac7f9f5c2/Schottland__Glenfinnan_Viaduct-2.jpg?w=800&q=60&fm=webp',
                   cityName: 'Highlands',
-                  countryName: 'Scotland', 
-                  rating: '4.8/5', 
-                  reviewCount: '240 reviews', 
-                  description: 'Experience the rugged beauty of the Scottish Highlands. Visit historic castles, sail across mysterious lochs, and ride the famous Jacobite steam train.', 
+                  countryName: 'Scotland',
+                  rating: '4.8/5',
+                  reviewCount: '240 reviews',
+                  description: 'Experience the rugged beauty of the Scottish Highlands. Visit historic castles, sail across mysterious lochs, and ride the famous Jacobite steam train.',
                   featuredTourTitle: 'Loch Ness Tour',
-                  featuredTourDuration: '3 Days 2 Nights', 
-                  featuredTourPrice: '250 USD', 
+                  featuredTourDuration: '3 Days 2 Nights',
+                  featuredTourPrice: '250 USD',
                   featuredTourPersonText: 'for 1 Person',
-                  featuredTourImageUrl: 'https://images.ctfassets.net/rc3dlxapnu6k/5gU2tKCncSVhSKGLZuhocq/f862b40488d9ec4f6246a17ac7f9f5c2/Schottland__Glenfinnan_Viaduct-2.jpg?w=800&q=60&fm=webp'
-              )),
+                  featuredTourImageUrl: 'https://images.ctfassets.net/rc3dlxapnu6k/5gU2tKCncSVhSKGLZuhocq/f862b40488d9ec4f6246a17ac7f9f5c2/Schottland__Glenfinnan_Viaduct-2.jpg?w=800&q=60&fm=webp',
+                ),
+              ),
             );
-          }
+          },
         ),
 
-        // --- GILGIT BALTISTAN (GRID) ---
+        // 3. Gilgit
         DestinationCard(
           isGrid: true,
           imageUrl: 'https://www.arabnews.pk/sites/default/files/styles/n_670_395/public/2025/01/03/4560177-1578019235.jpg?itok=wnu_fCIT',
-          title: 'Gilgit', duration: '7 days 6 nights', price: '\$450',
+          title: 'Gilgit',
+          duration: '7 days 6 nights',
+          price: '\$450',
           onTap: () {
-            Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const DestinationDetailScreen(
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const DestinationDetailScreen(
                   headerImageUrl: 'https://www.arabnews.pk/sites/default/files/styles/n_670_395/public/2025/01/03/4560177-1578019235.jpg?itok=wnu_fCIT',
                   cityName: 'Hunza Valley',
-                  countryName: 'Gilgit Baltistan', 
-                  rating: '4.9/5', 
-                  reviewCount: '312 reviews', 
-                  description: 'Explore the majestic peaks of the Karakoram. Walk among the vibrant autumn leaves, visit ancient forts, and meet the incredibly hospitable locals.', 
+                  countryName: 'Gilgit Baltistan',
+                  rating: '4.9/5',
+                  reviewCount: '312 reviews',
+                  description: 'Explore the majestic peaks of the Karakoram. Walk among the vibrant autumn leaves, visit ancient forts, and meet the incredibly hospitable locals.',
                   featuredTourTitle: 'Fairy Meadows',
-                  featuredTourDuration: '7 Days 6 Nights', 
-                  featuredTourPrice: '450 USD', 
+                  featuredTourDuration: '7 Days 6 Nights',
+                  featuredTourPrice: '450 USD',
                   featuredTourPersonText: 'for 1 Person',
-                  featuredTourImageUrl: 'https://www.arabnews.pk/sites/default/files/styles/n_670_395/public/2025/01/03/4560177-1578019235.jpg?itok=wnu_fCIT'
-              )),
+                  featuredTourImageUrl: 'https://www.arabnews.pk/sites/default/files/styles/n_670_395/public/2025/01/03/4560177-1578019235.jpg?itok=wnu_fCIT',
+                ),
+              ),
             );
-          }
+          },
         ),
 
-        // --- MYANMAR (GRID) ---
+        // 4. Myanmar
         DestinationCard(
           isGrid: true,
           imageUrl: 'https://cdn.kimkim.com/files/a/content_articles/featured_photos/a1317e3c775ca06fb05848852ba24b5d4344ee6a/big-45c4c417598f0104f1d4c7262dedf921.jpg',
-          title: 'Myanmar', duration: '10 days 9 nights', price: '\$350',
+          title: 'Myanmar',
+          duration: '10 days 9 nights',
+          price: '\$350',
           onTap: () {
-            Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const DestinationDetailScreen(
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const DestinationDetailScreen(
                   headerImageUrl: 'https://cdn.kimkim.com/files/a/content_articles/featured_photos/a1317e3c775ca06fb05848852ba24b5d4344ee6a/big-45c4c417598f0104f1d4c7262dedf921.jpg',
                   cityName: 'Bagan',
-                  countryName: 'Myanmar', 
-                  rating: '4.6/5', 
-                  reviewCount: '145 reviews', 
-                  description: 'Discover thousands of ancient Buddhist temples scattered across the plains of Bagan. Take a sunrise hot air balloon ride for a once-in-a-lifetime view.', 
+                  countryName: 'Myanmar',
+                  rating: '4.6/5',
+                  reviewCount: '145 reviews',
+                  description: 'Discover thousands of ancient Buddhist temples scattered across the plains of Bagan. Take a sunrise hot air balloon ride for a once-in-a-lifetime view.',
                   featuredTourTitle: 'Temple Tour',
-                  featuredTourDuration: '10 Days 9 Nights', 
-                  featuredTourPrice: '350 USD', 
+                  featuredTourDuration: '10 Days 9 Nights',
+                  featuredTourPrice: '350 USD',
                   featuredTourPersonText: 'for 1 Person',
-                  featuredTourImageUrl: 'https://cdn.kimkim.com/files/a/content_articles/featured_photos/a1317e3c775ca06fb05848852ba24b5d4344ee6a/big-45c4c417598f0104f1d4c7262dedf921.jpg'
-              )),
+                  featuredTourImageUrl: 'https://cdn.kimkim.com/files/a/content_articles/featured_photos/a1317e3c775ca06fb05848852ba24b5d4344ee6a/big-45c4c417598f0104f1d4c7262dedf921.jpg',
+                ),
+              ),
             );
-          }
+          },
         ),
 
-        // --- NEW ZEALAND (GRID) ---
+        // 5. New Zealand
         DestinationCard(
           isGrid: true,
           imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRADpXUik5v4_oyeJPbggxSg7YhVuyuXeJc7pMxAdZsCdwkoT4xuhmGSBRQ&s=10',
-          title: 'New Zealand', duration: '14 days 13 nights', price: '\$900',
+          title: 'New Zealand',
+          duration: '14 days 13 nights',
+          price: '\$900',
           onTap: () {
-            Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const DestinationDetailScreen(
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const DestinationDetailScreen(
                   headerImageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRADpXUik5v4_oyeJPbggxSg7YhVuyuXeJc7pMxAdZsCdwkoT4xuhmGSBRQ&s=10',
                   cityName: 'Queenstown',
-                  countryName: 'New Zealand', 
-                  rating: '5.0/5', 
-                  reviewCount: '500+ reviews', 
-                  description: 'The adventure capital of the world! Bungee jump off historic bridges, cruise through Milford Sound, and hike the stunning trails of the South Island.', 
+                  countryName: 'New Zealand',
+                  rating: '5.0/5',
+                  reviewCount: '500+ reviews',
+                  description: 'The adventure capital of the world! Bungee jump off historic bridges, cruise through Milford Sound, and hike the stunning trails of the South Island.',
                   featuredTourTitle: 'Milford Sound',
-                  featuredTourDuration: '14 Days 13 Nights', 
-                  featuredTourPrice: '900 USD', 
+                  featuredTourDuration: '14 Days 13 Nights',
+                  featuredTourPrice: '900 USD',
                   featuredTourPersonText: 'for 1 Person',
-                  featuredTourImageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRADpXUik5v4_oyeJPbggxSg7YhVuyuXeJc7pMxAdZsCdwkoT4xuhmGSBRQ&s=10'
-              )),
+                  featuredTourImageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRADpXUik5v4_oyeJPbggxSg7YhVuyuXeJc7pMxAdZsCdwkoT4xuhmGSBRQ&s=10',
+                ),
+              ),
             );
-          }
+          },
         ),
       ],
     );
   }
 }
 
+// =====================================================================
+// DESTINATION DETAIL SCREEN TEMPLATE
+// =====================================================================
 class DestinationDetailScreen extends StatelessWidget {
-  final String headerImageUrl; 
+  // Required data variables so this single screen can show ANY destination!
+  final String headerImageUrl;
   final String cityName;
   final String countryName;
   final String rating;
@@ -610,15 +697,15 @@ class DestinationDetailScreen extends StatelessWidget {
 
   const DestinationDetailScreen({
     super.key,
-    required this.headerImageUrl, 
-    required this.cityName, 
-    required this.countryName, 
-    required this.rating, 
+    required this.headerImageUrl,
+    required this.cityName,
+    required this.countryName,
+    required this.rating,
     required this.reviewCount,
     required this.description,
-    required this.featuredTourTitle, 
-    required this.featuredTourDuration, 
-    required this.featuredTourPrice, 
+    required this.featuredTourTitle,
+    required this.featuredTourDuration,
+    required this.featuredTourPrice,
     required this.featuredTourPersonText,
     required this.featuredTourImageUrl,
   });
@@ -626,84 +713,90 @@ class DestinationDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-    child: Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration( 
-          color: Colors.white,
-          image: DecorationImage(
-            image: NetworkImage(headerImageUrl), 
-            fit: BoxFit.fitWidth,
-            alignment: Alignment.topCenter,
-          ),
-        ),
-        
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0, bottom: 10.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black, size: 18),
-                      onPressed: () => Navigator.pop(context), 
-                    ),
-                  ),
-                  Container(
-                    decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                    child: IconButton(
-                      icon: const Icon(Icons.menu, color: Colors.black),
-                      onPressed: () {},
-                    ),
-                  ),
-                ],
-              ),
+      child: Scaffold(
+        body: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            // Draws the destination photo across the background of the screen
+            image: DecorationImage(
+              image: NetworkImage(headerImageUrl),
+              fit: BoxFit.fitWidth,
+              alignment: Alignment.topCenter,
             ),
-            
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.zero, 
-                children: [
-                  const SizedBox(height: 150),
-                  Container(
-                    width: double.infinity,
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(50),
-                        topRight: Radius.circular(50),
+          ),
+          child: Column(
+            children: [
+              // --- FIXED APP BAR BUTTONS ---
+              Padding(
+                padding: const EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0, bottom: 10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black, size: 18),
+                        onPressed: () => Navigator.pop(context),
                       ),
                     ),
-
-                    // 💡 Look how incredibly clean passing data to this sheet is now!
-                    child: DestinationInfoSheet(
-                      cityName: cityName, 
-                      countryName: countryName, 
-                      rating: rating, 
-                      reviewCount: reviewCount, 
-                      description: description, 
-                      tourTitle: featuredTourTitle, 
-                      tourDuration: featuredTourDuration, 
-                      tourPrice: featuredTourPrice, 
-                      tourPersonText: featuredTourPersonText, 
-                      tourImageUrl: featuredTourImageUrl
+                    Container(
+                      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                      child: IconButton(
+                        icon: const Icon(Icons.menu, color: Colors.black),
+                        onPressed: () {},
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+
+              // --- SCROLLING CONTENT SHEET ---
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: [
+                    // This invisible box pushes the white container down so the photo is visible!
+                    const SizedBox(height: 150),
+                    
+                    Container(
+                      width: double.infinity,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(50),
+                          topRight: Radius.circular(50),
+                        ),
+                      ),
+                      // Renders the data sheet component
+                      child: DestinationInfoSheet(
+                        cityName: cityName,
+                        countryName: countryName,
+                        rating: rating,
+                        reviewCount: reviewCount,
+                        description: description,
+                        tourTitle: featuredTourTitle,
+                        tourDuration: featuredTourDuration,
+                        tourPrice: featuredTourPrice,
+                        tourPersonText: featuredTourPersonText,
+                        tourImageUrl: featuredTourImageUrl,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-    ),
     );
   }
 }
 
+// =====================================================================
+// DESTINATION DETAIL - WHITE CONTENT SHEET
+// =====================================================================
 class DestinationInfoSheet extends StatelessWidget {
   final String cityName;
   final String countryName;
@@ -718,14 +811,14 @@ class DestinationInfoSheet extends StatelessWidget {
 
   const DestinationInfoSheet({
     super.key,
-    required this.cityName, 
-    required this.countryName, 
-    required this.rating, 
+    required this.cityName,
+    required this.countryName,
+    required this.rating,
     required this.reviewCount,
     required this.description,
-    required this.tourTitle, 
-    required this.tourDuration, 
-    required this.tourPrice, 
+    required this.tourTitle,
+    required this.tourDuration,
+    required this.tourPrice,
     required this.tourPersonText,
     required this.tourImageUrl,
   });
@@ -735,49 +828,52 @@ class DestinationInfoSheet extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(25.0),
       child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(cityName, style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
-                Text(rating, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold))
-              ]
-            ),
-            const SizedBox(height: 4),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(countryName, style: const TextStyle(color: Colors.grey, fontSize: 16)),
-                Text(reviewCount, style: const TextStyle(color: Colors.grey, fontSize: 14))
-              ]
-            ),
-            const SizedBox(height: 24),
-            Text(
-              description,
-              style: const TextStyle(fontSize: 16, height: 1.5),
-            ),
-            const SizedBox(height: 8),
-            const Text('Read more', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, decoration: TextDecoration.underline)),
-            const SizedBox(height: 32),
-            const Text('Upcoming tours', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            
-            // 💡 Clean variable passing down to the Tourlist
-            UpcomingToursList(
-              tourPersonText: tourPersonText, 
-              tourPrice: tourPrice, 
-              tourTitle: tourTitle, 
-              tourDuration: tourDuration, 
-              tourImageUrl: tourImageUrl
-            ),
-          ]
-        ),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(cityName, style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+              Text(rating, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(countryName, style: const TextStyle(color: Colors.grey, fontSize: 16)),
+              Text(reviewCount, style: const TextStyle(color: Colors.grey, fontSize: 14)),
+            ],
+          ),
+          const SizedBox(height: 24),
+          Text(
+            description,
+            style: const TextStyle(fontSize: 16, height: 1.5),
+          ),
+          const SizedBox(height: 8),
+          const Text('Read more', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, decoration: TextDecoration.underline)),
+          const SizedBox(height: 32),
+          const Text('Upcoming tours', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 16),
+          
+          // Renders the horizontal list of smaller tour cards
+          UpcomingToursList(
+            tourPersonText: tourPersonText,
+            tourPrice: tourPrice,
+            tourTitle: tourTitle,
+            tourDuration: tourDuration,
+            tourImageUrl: tourImageUrl,
+          ),
+        ],
+      ),
     );
   }
 }
 
+// =====================================================================
+// DESTINATION DETAIL - HORIZONTAL TOURS SCROLLER
+// =====================================================================
 class UpcomingToursList extends StatelessWidget {
   final String tourPersonText;
   final String tourPrice;
@@ -787,20 +883,21 @@ class UpcomingToursList extends StatelessWidget {
 
   const UpcomingToursList({
     super.key,
-    required this.tourTitle, 
-    required this.tourDuration, 
-    required this.tourPrice, 
+    required this.tourTitle,
+    required this.tourDuration,
+    required this.tourPrice,
     required this.tourPersonText,
     required this.tourImageUrl,
   });
-  
+
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return SizedBox(
       height: 220,
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
+          // The dynamic featured tour passed from the parent widget
           TourCard(
             imageUrl: tourImageUrl,
             title: tourTitle,
@@ -808,6 +905,7 @@ class UpcomingToursList extends StatelessWidget {
             price: tourPrice,
             person: tourPersonText,
           ),
+          // Placeholder tour 1
           TourCard(
             imageUrl: tourImageUrl,
             title: tourTitle,
@@ -815,6 +913,7 @@ class UpcomingToursList extends StatelessWidget {
             price: tourPrice,
             person: tourPersonText,
           ),
+          // Placeholder tour 2
           TourCard(
             imageUrl: tourImageUrl,
             title: tourTitle,
@@ -822,13 +921,15 @@ class UpcomingToursList extends StatelessWidget {
             price: tourPrice,
             person: tourPersonText,
           ),
-          // Placeholder cards
         ],
       ),
     );
   }
 }
 
+// =====================================================================
+// SMALL TOUR CARD (Used inside the Detail Screen's horizontal list)
+// =====================================================================
 class TourCard extends StatelessWidget {
   final String imageUrl;
   final String title;
@@ -836,13 +937,20 @@ class TourCard extends StatelessWidget {
   final String price;
   final String person;
 
-  const TourCard({super.key, required this.imageUrl, required this.title, required this.duration, required this.price, required this.person});
+  const TourCard({
+    super.key,
+    required this.imageUrl,
+    required this.title,
+    required this.duration,
+    required this.price,
+    required this.person,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: 170,
-      margin: const EdgeInsets.only(right: 15),
+      margin: const EdgeInsets.only(right: 15), // Spacing between cards
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -856,7 +964,7 @@ class TourCard extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             ),
-            alignment: Alignment.topRight, 
+            alignment: Alignment.topRight,
             padding: const EdgeInsets.all(8),
             child: Container(
               decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
