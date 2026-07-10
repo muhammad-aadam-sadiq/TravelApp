@@ -144,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                           // 2. Scotland
                           DestinationCard(
-                            imageUrl: 'https://images.ctfassets.net/rc3dlxapnu6k/5gU2tKCncSVhSKGLZuhocq/f862b40488d9ec4f6246a17ac7f9f5c2/Schottland__Glenfinnan_Viaduct-2.jpg?w=800&q=60&fm=webp',
+                            imageUrl: 'https://wanderlusters.com/wp-content/uploads/2018/10/Scottish-Highlands-Hiking-Guide.jpg',
                             title: 'Scotland',
                             duration: '5 days 4 nights',
                             price: '\$250',
@@ -153,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => const DestinationDetailScreen(
-                                    headerImageUrl: 'https://images.ctfassets.net/rc3dlxapnu6k/5gU2tKCncSVhSKGLZuhocq/f862b40488d9ec4f6246a17ac7f9f5c2/Schottland__Glenfinnan_Viaduct-2.jpg?w=800&q=60&fm=webp',
+                                    headerImageUrl: 'https://wanderlusters.com/wp-content/uploads/2018/10/Scottish-Highlands-Hiking-Guide.jpg',
                                     cityName: 'Highlands',
                                     countryName: 'Scotland',
                                     rating: '4.8/5',
@@ -163,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     featuredTourDuration: '3 Days 2 Nights',
                                     featuredTourPrice: '250 USD',
                                     featuredTourPersonText: 'for 1 Person',
-                                    featuredTourImageUrl: 'https://images.ctfassets.net/rc3dlxapnu6k/5gU2tKCncSVhSKGLZuhocq/f862b40488d9ec4f6246a17ac7f9f5c2/Schottland__Glenfinnan_Viaduct-2.jpg?w=800&q=60&fm=webp',
+                                    featuredTourImageUrl: 'https://wanderlusters.com/wp-content/uploads/2018/10/Scottish-Highlands-Hiking-Guide.jpg',
                                   ),
                                 ),
                               );
@@ -172,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                           // 3. Gilgit Baltistan
                           DestinationCard(
-                            imageUrl: 'https://www.arabnews.pk/sites/default/files/styles/n_670_395/public/2025/01/03/4560177-1578019235.jpg?itok=wnu_fCIT',
+                            imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4oIfiVPNgZ06aCaF5IA36f8jUmlmXeVHY0HDqDVL4-A3Y5v3agbQUyMA&s=10',
                             title: 'Gilgit Baltistan',
                             duration: '7 days 6 nights',
                             price: '\$450',
@@ -181,7 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => const DestinationDetailScreen(
-                                    headerImageUrl: 'https://www.arabnews.pk/sites/default/files/styles/n_670_395/public/2025/01/03/4560177-1578019235.jpg?itok=wnu_fCIT',
+                                    headerImageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4oIfiVPNgZ06aCaF5IA36f8jUmlmXeVHY0HDqDVL4-A3Y5v3agbQUyMA&s=10',
                                     cityName: 'Hunza Valley',
                                     countryName: 'Gilgit Baltistan',
                                     rating: '4.9/5',
@@ -191,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     featuredTourDuration: '7 Days 6 Nights',
                                     featuredTourPrice: '450 USD',
                                     featuredTourPersonText: 'for 1 Person',
-                                    featuredTourImageUrl: 'https://www.arabnews.pk/sites/default/files/styles/n_670_395/public/2025/01/03/4560177-1578019235.jpg?itok=wnu_fCIT',
+                                    featuredTourImageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4oIfiVPNgZ06aCaF5IA36f8jUmlmXeVHY0HDqDVL4-A3Y5v3agbQUyMA&s=10',
                                   ),
                                 ),
                               );
@@ -561,7 +561,7 @@ class GridViewOption extends StatelessWidget {
         // 2. Scotland
         DestinationCard(
           isGrid: true,
-          imageUrl: 'https://images.ctfassets.net/rc3dlxapnu6k/5gU2tKCncSVhSKGLZuhocq/f862b40488d9ec4f6246a17ac7f9f5c2/Schottland__Glenfinnan_Viaduct-2.jpg?w=800&q=60&fm=webp',
+          imageUrl: 'https://wanderlusters.com/wp-content/uploads/2018/10/Scottish-Highlands-Hiking-Guide.jpg',
           title: 'Scotland',
           duration: '5 days 4 nights',
           price: '\$250',
@@ -570,7 +570,7 @@ class GridViewOption extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => const DestinationDetailScreen(
-                  headerImageUrl: 'https://images.ctfassets.net/rc3dlxapnu6k/5gU2tKCncSVhSKGLZuhocq/f862b40488d9ec4f6246a17ac7f9f5c2/Schottland__Glenfinnan_Viaduct-2.jpg?w=800&q=60&fm=webp',
+                  headerImageUrl: "https://wanderlusters.com/wp-content/uploads/2018/10/Scottish-Highlands-Hiking-Guide.jpg",
                   cityName: 'Highlands',
                   countryName: 'Scotland',
                   rating: '4.8/5',
@@ -580,7 +580,7 @@ class GridViewOption extends StatelessWidget {
                   featuredTourDuration: '3 Days 2 Nights',
                   featuredTourPrice: '250 USD',
                   featuredTourPersonText: 'for 1 Person',
-                  featuredTourImageUrl: 'https://images.ctfassets.net/rc3dlxapnu6k/5gU2tKCncSVhSKGLZuhocq/f862b40488d9ec4f6246a17ac7f9f5c2/Schottland__Glenfinnan_Viaduct-2.jpg?w=800&q=60&fm=webp',
+                  featuredTourImageUrl: 'https://wanderlusters.com/wp-content/uploads/2018/10/Scottish-Highlands-Hiking-Guide.jpg',
                 ),
               ),
             );
@@ -590,7 +590,7 @@ class GridViewOption extends StatelessWidget {
         // 3. Gilgit
         DestinationCard(
           isGrid: true,
-          imageUrl: 'https://www.arabnews.pk/sites/default/files/styles/n_670_395/public/2025/01/03/4560177-1578019235.jpg?itok=wnu_fCIT',
+          imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4oIfiVPNgZ06aCaF5IA36f8jUmlmXeVHY0HDqDVL4-A3Y5v3agbQUyMA&s=10',
           title: 'Gilgit',
           duration: '7 days 6 nights',
           price: '\$450',
@@ -599,7 +599,7 @@ class GridViewOption extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => const DestinationDetailScreen(
-                  headerImageUrl: 'https://www.arabnews.pk/sites/default/files/styles/n_670_395/public/2025/01/03/4560177-1578019235.jpg?itok=wnu_fCIT',
+                  headerImageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4oIfiVPNgZ06aCaF5IA36f8jUmlmXeVHY0HDqDVL4-A3Y5v3agbQUyMA&s=10',
                   cityName: 'Hunza Valley',
                   countryName: 'Gilgit Baltistan',
                   rating: '4.9/5',
@@ -609,7 +609,7 @@ class GridViewOption extends StatelessWidget {
                   featuredTourDuration: '7 Days 6 Nights',
                   featuredTourPrice: '450 USD',
                   featuredTourPersonText: 'for 1 Person',
-                  featuredTourImageUrl: 'https://www.arabnews.pk/sites/default/files/styles/n_670_395/public/2025/01/03/4560177-1578019235.jpg?itok=wnu_fCIT',
+                  featuredTourImageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4oIfiVPNgZ06aCaF5IA36f8jUmlmXeVHY0HDqDVL4-A3Y5v3agbQUyMA&s=10',
                 ),
               ),
             );
