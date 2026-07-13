@@ -54,7 +54,7 @@ final List<Destination> myDestinations = [
     tourPersonText: 'for 1 Person',
   ),
   const Destination(
-    imageUrl: 'https://images.ctfassets.net/rc3dlxapnu6k/5gU2tKCncSVhSKGLZuhocq/f862b40488d9ec4f6246a17ac7f9f5c2/Schottland__Glenfinnan_Viaduct-2.jpg?w=800&q=60&fm=webp',
+    imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSABBDxMTS6VuQiuWr5HSiJBSd4B_IpvBoBqxS0Bes90zbm_tm3gJxnOVc&s=10',
     cityName: 'Highlands',
     countryName: 'Scotland',
     rating: '4.8/5',
@@ -66,7 +66,7 @@ final List<Destination> myDestinations = [
     tourPersonText: 'for 1 Person',
   ),
   const Destination(
-    imageUrl: 'https://www.arabnews.pk/sites/default/files/styles/n_670_395/public/2025/01/03/4560177-1578019235.jpg?itok=wnu_fCIT',
+    imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTEdMuu_LkD2i4gUS_wIvlVbRTetmC7lKTQ1rZl-QdVQ&s=10',
     cityName: 'Hunza Valley',
     countryName: 'Gilgit Baltistan',
     rating: '4.9/5',
