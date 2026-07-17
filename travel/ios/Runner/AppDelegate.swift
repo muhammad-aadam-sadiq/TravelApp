@@ -1,5 +1,6 @@
 import Flutter
 import UIKit
+import GoogleMaps
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
@@ -9,6 +10,8 @@ import UIKit
   ) -> Bool {
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
+
+  GMSServices.provideAPIKey("YOUR_API_KEY_HERE")
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)

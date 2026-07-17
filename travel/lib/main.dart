@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 void main() {
   runApp(const MainApp());
 }
 
 // =====================================================================
-// 1. DATA MODEL (The Blueprint)
+// DATA MODEL
 // =====================================================================
-// This class acts as a container to bundle all related information for a 
-// single destination. Instead of passing 10 variables around, we pass 1 object.
+
+/// A container to bundle all related information for a single destination.
 class Destination {
   final String imageUrl;
   final String cityName;
@@ -20,6 +21,7 @@ class Destination {
   final String tourDuration;
   final String tourPrice;
   final String tourPersonText;
+  final MapScreen mapScreen;
 
   const Destination({
     required this.imageUrl,
@@ -32,14 +34,15 @@ class Destination {
     required this.tourDuration,
     required this.tourPrice,
     required this.tourPersonText,
+    required this.mapScreen,
   });
 }
 
 // =====================================================================
-// 2. MOCK DATABASE
+// MOCK DATABASE
 // =====================================================================
-// A hardcoded list of Destination objects. In a real app, this data 
-// would typically be fetched from an API or a database like Firebase.
+
+/// A hardcoded list of Destination objects simulating a database/API response.
 final List<Destination> myDestinations = [
   const Destination(
     imageUrl: 'https://ik.imagekit.io/travalot/development/resources/attachments/2025/11/12/8fbd8b80-d71e-11f0-b871-9729adfa2385.jpg?tr=w-1600,h-1067,c-at_max:f-webp:q-85',
@@ -52,6 +55,14 @@ final List<Destination> myDestinations = [
     tourDuration: '6 Days 5 Nights',
     tourPrice: '\$630',
     tourPersonText: 'for 1 Person',
+    mapScreen: MapScreen(
+      idMap: "map_reykjavik",
+      markLocation: "pin_reykjavik",
+      titlePlace: "Reykjavik",
+      snippetData: "Fire & Ice Trip",
+      lati: 64.1466,
+      lngi: -21.9426,
+    ),
   ),
   const Destination(
     imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSABBDxMTS6VuQiuWr5HSiJBSd4B_IpvBoBqxS0Bes90zbm_tm3gJxnOVc&s=10',
@@ -64,6 +75,14 @@ final List<Destination> myDestinations = [
     tourDuration: '3 Days 2 Nights',
     tourPrice: '\$250',
     tourPersonText: 'for 1 Person',
+    mapScreen: MapScreen(
+      idMap: "map_lochness",
+      markLocation: "pin_lochness",
+      titlePlace: "Loch Ness, Highlands",
+      snippetData: "Scottish Highlands",
+      lati: 57.3229,
+      lngi: -4.4244,
+    ),
   ),
   const Destination(
     imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTEdMuu_LkD2i4gUS_wIvlVbRTetmC7lKTQ1rZl-QdVQ&s=10',
@@ -76,6 +95,14 @@ final List<Destination> myDestinations = [
     tourDuration: '7 Days 6 Nights',
     tourPrice: '\$450',
     tourPersonText: 'for 1 Person',
+    mapScreen: MapScreen(
+      idMap: "map_hunza",
+      markLocation: "pin_hunza",
+      titlePlace: "Hunza Valley",
+      snippetData: "Gilgit Baltistan",
+      lati: 36.3167,
+      lngi: 74.6500,
+    ),
   ),
   const Destination(
     imageUrl: 'https://cdn.kimkim.com/files/a/content_articles/featured_photos/a1317e3c775ca06fb05848852ba24b5d4344ee6a/big-45c4c417598f0104f1d4c7262dedf921.jpg',
@@ -88,6 +115,14 @@ final List<Destination> myDestinations = [
     tourDuration: '10 Days 9 Nights',
     tourPrice: '\$350',
     tourPersonText: 'for 1 Person',
+    mapScreen: MapScreen(
+      idMap: "map_bagan",
+      markLocation: "pin_bagan",
+      titlePlace: "Bagan Temples",
+      snippetData: "Ancient City",
+      lati: 21.1717,
+      lngi: 94.8661,
+    ),
   ),
   const Destination(
     imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRADpXUik5v4_oyeJPbggxSg7YhVuyuXeJc7pMxAdZsCdwkoT4xuhmGSBRQ&s=10',
@@ -100,12 +135,21 @@ final List<Destination> myDestinations = [
     tourDuration: '14 Days 13 Nights',
     tourPrice: '\$900',
     tourPersonText: 'for 1 Person',
+    mapScreen: MapScreen(
+      idMap: "map_queenstown",
+      markLocation: "pin_queenstown",
+      titlePlace: "Queenstown",
+      snippetData: "Adventure Capital",
+      lati: -45.0312,
+      lngi: 168.6626,
+    ),
   ),
 ];
 
 // =====================================================================
 // ROOT APP CONFIGURATION
 // =====================================================================
+
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
@@ -113,14 +157,15 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomeScreen(), // Directs to our main UI
+      home: HomeScreen(),
     );
   }
 }
 
 // =====================================================================
-// HOME SCREEN (Stateful to handle Grid vs List toggle)
+// HOME SCREEN
 // =====================================================================
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -129,40 +174,44 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // State variable tracking current layout. False = List, True = Grid.
-  bool isgrid = false;
+  /// State variable tracking layout structure.
+  /// False = List View, True = Grid View.
+  bool isGrid = false;
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       bottom: false, // Ensures the list scrolls *behind* the floating nav bar
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8F9FA), // Soft grey background
-        extendBody: true, // CRUCIAL: Allows the background/content to flow under the NavigationBar
+        backgroundColor: const Color(0xFFF8F9FA),
+        extendBody: true, // Allows background/content to flow under NavigationBar
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start, 
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 15),
-              const CardExample(), // Top Profile Header
+              const ProfileHeader(),
               const SizedBox(height: 15),
-              const SearchBarApp(), // Search Bar
+              const SearchBarWidget(),
               const SizedBox(height: 30),
               
               // --- Title & Layout Toggle Row ---
               Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Select your next trip', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold), textAlign: TextAlign.left, textDirection: .ltr),
-                  const Spacer(),
+                  const Text(
+                    'Select your next trip',
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   FilledButton(
                     onPressed: () {
-                      // Calling setState forces the screen to rebuild with the new isgrid value
                       setState(() {
-                        isgrid = !isgrid;
+                        isGrid = !isGrid;
                       });
                     },
                     style: ElevatedButton.styleFrom(
@@ -170,25 +219,39 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.all(8),
                       backgroundColor: Colors.black,
                     ),
-                    // Dynamically changes icon based on current state
-                    child: Icon(isgrid ? Icons.list : Icons.grid_view),
+                    child: Icon(isGrid ? Icons.list : Icons.grid_view),
                   ),
-                ]
+                ],
               ),
               
               const SizedBox(height: 5),
               
               // --- Category Filters (Horizontal Scroll) ---
               SizedBox(
-                height: 50, // Constrains height so the horizontal ListView doesn't throw an error
+                height: 50,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   children: const [
-                    TextButton(onPressed: null, child: Text('South America', style: TextStyle(color: Colors.black))),
-                    TextButton(onPressed: null, child: Text('North America', style: TextStyle(color: Colors.grey))),
-                    TextButton(onPressed: null, child: Text('Asia', style: TextStyle(color: Colors.grey))),
-                    TextButton(onPressed: null, child: Text('Europe', style: TextStyle(color: Colors.grey))),
-                    TextButton(onPressed: null, child: Text('Africa', style: TextStyle(color: Colors.grey))),
+                    TextButton(
+                      onPressed: null,
+                      child: Text('South America', style: TextStyle(color: Colors.black)),
+                    ),
+                    TextButton(
+                      onPressed: null,
+                      child: Text('North America', style: TextStyle(color: Colors.grey)),
+                    ),
+                    TextButton(
+                      onPressed: null,
+                      child: Text('Asia', style: TextStyle(color: Colors.grey)),
+                    ),
+                    TextButton(
+                      onPressed: null,
+                      child: Text('Europe', style: TextStyle(color: Colors.grey)),
+                    ),
+                    TextButton(
+                      onPressed: null,
+                      child: Text('Africa', style: TextStyle(color: Colors.grey)),
+                    ),
                   ],
                 ),
               ),
@@ -196,37 +259,32 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 15),
               
               // --- Dynamic Content Area ---
-              // Expanded forces this section to take up all remaining vertical space
               Expanded(
-                child: isgrid 
-                    ? const GridViewOption() // Render Grid if true
-                    : ListView(              // Render List if false
-                        // Bottom padding ensures the last item isn't hidden behind the Nav Bar
+                child: isGrid 
+                    ? const DestinationGridView()
+                    : ListView(
                         padding: const EdgeInsets.only(bottom: 120, top: 16),
-                        
-                        // 💡 THE MAGIC LOOP: Iterates over the myDestinations list 
-                        // and dynamically creates a DestinationCard for each one!
-                        children: myDestinations.map((destinationData) {
+                        children: myDestinations.map((destination) {
                           return DestinationCard(
-                            destination: destinationData, // Pass the specific data object
+                            destination: destination,
                             onTap: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => DestinationDetailScreen(
-                                    destination: destinationData, // Pass data to next screen
+                                    destination: destination,
                                   ),
                                 ),
                               );
                             },
                           );
-                        }).toList(), // Converts the map operation back into a List of widgets
+                        }).toList(),
                       ),
               ),
             ],
           ),
         ),
-        bottomNavigationBar: const NavigationExample(),
+        bottomNavigationBar: const CustomNavigationBar(),
       ),
     );
   }
@@ -235,8 +293,9 @@ class _HomeScreenState extends State<HomeScreen> {
 // =====================================================================
 // GRID VIEW LAYOUT COMPONENT
 // =====================================================================
-class GridViewOption extends StatelessWidget {
-  const GridViewOption({super.key});
+
+class DestinationGridView extends StatelessWidget {
+  const DestinationGridView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -245,20 +304,18 @@ class GridViewOption extends StatelessWidget {
       primary: false,
       crossAxisSpacing: 10,
       mainAxisSpacing: 10,
-      crossAxisCount: 2, // 2 items per row
-      childAspectRatio: 0.85, // Adjusts proportion so cards are taller than they are wide
-      
-      // Similar magic loop as the ListView, but passes isGrid: true
-      children: myDestinations.map((destinationData) {
+      crossAxisCount: 2, // Sets 2 items per row
+      childAspectRatio: 0.85,
+      children: myDestinations.map((destination) {
         return DestinationCard(
           isGrid: true, // Tells the card to shrink its UI for the grid
-          destination: destinationData,
+          destination: destination,
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => DestinationDetailScreen(
-                  destination: destinationData,
+                  destination: destination,
                 ),
               ),
             );
@@ -270,8 +327,9 @@ class GridViewOption extends StatelessWidget {
 }
 
 // =====================================================================
-// REUSABLE DESTINATION CARD (Adapts to List or Grid)
+// REUSABLE DESTINATION CARD
 // =====================================================================
+
 class DestinationCard extends StatelessWidget {
   final Destination destination; 
   final bool isGrid; 
@@ -281,26 +339,28 @@ class DestinationCard extends StatelessWidget {
     super.key,
     required this.destination,
     required this.onTap,
-    this.isGrid = false, // Defaults to List View formatting
+    this.isGrid = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      // Ternary operators adjust dimensions based on view mode
       height: isGrid ? 180 : 220,
       width: double.infinity,
-      // Grid handles its own spacing, so margin is 0 when in grid mode
       margin: isGrid ? EdgeInsets.zero : const EdgeInsets.only(bottom: 15),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: Stack(
           children: [
             // 1. Background Image
-            Image.network(destination.imageUrl, fit: BoxFit.cover, width: double.infinity, height: double.infinity),
+            Image.network(
+              destination.imageUrl,
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
+            ),
             
             // 2. Ripple Effect Layer
-            // Placing Material > InkWell inside the Stack ensures the splash effect overlays the image
             Positioned.fill(
               child: Material(
                 color: Colors.transparent, 
@@ -316,10 +376,14 @@ class DestinationCard extends StatelessWidget {
               right: 12,
               child: CircleAvatar(
                 backgroundColor: Colors.white,
-                radius: isGrid ? 14 : 18, // Shrinks in grid view
+                radius: isGrid ? 14 : 18,
                 child: IconButton(
                   padding: EdgeInsets.zero,
-                  icon: Icon(Icons.north_east, color: Colors.black, size: isGrid ? 14 : 20),
+                  icon: Icon(
+                    Icons.north_east,
+                    color: Colors.black,
+                    size: isGrid ? 14 : 20,
+                  ),
                   onPressed: onTap,
                 ),
               ),
@@ -331,7 +395,11 @@ class DestinationCard extends StatelessWidget {
               left: 16,
               child: Text(
                 destination.countryName, 
-                style: TextStyle(color: Colors.white, fontSize: isGrid ? 18 : 28, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: isGrid ? 18 : 28,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             
@@ -341,7 +409,11 @@ class DestinationCard extends StatelessWidget {
               right: 16,
               child: Text(
                 destination.tourPrice, 
-                style: TextStyle(color: Colors.white, fontSize: isGrid ? 14 : 20, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: isGrid ? 14 : 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             
@@ -351,10 +423,17 @@ class DestinationCard extends StatelessWidget {
               left: 16,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15),
+                ),
                 child: Text(
                   destination.tourDuration, 
-                  style: TextStyle(color: Colors.black, fontSize: isGrid ? 10 : 14, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: isGrid ? 10 : 14,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
@@ -368,8 +447,9 @@ class DestinationCard extends StatelessWidget {
 // =====================================================================
 // DESTINATION DETAIL SCREEN TEMPLATE
 // =====================================================================
+
 class DestinationDetailScreen extends StatelessWidget {
-  final Destination destination; // The single data object powering this screen
+  final Destination destination;
 
   const DestinationDetailScreen({
     super.key,
@@ -383,13 +463,12 @@ class DestinationDetailScreen extends StatelessWidget {
         body: Container(
           width: double.infinity,
           height: double.infinity,
-          // We set the background image on the parent container so elements can scroll over it
           decoration: BoxDecoration(
             color: Colors.white,
             image: DecorationImage(
               image: NetworkImage(destination.imageUrl), 
-              fit: BoxFit.fitWidth, // Prevents extreme zooming
-              alignment: Alignment.topCenter, // Pins image to the top
+              fit: BoxFit.fitWidth,
+              alignment: Alignment.topCenter,
             ),
           ),
           child: Column(
@@ -418,26 +497,36 @@ class DestinationDetailScreen extends StatelessWidget {
                 ),
               ),
 
-              // --- SCROLLING WHITE CONTENT SHEET ---
+              // --- FIXED GAP TO SHOW THE BACKGROUND IMAGE ---
+              const SizedBox(height: 150), 
+
+              // --- STATIONARY ROUNDED SHEET ---
               Expanded(
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  children: [
-                    // This invisible box pushes the white container down so the photo is visible above it
-                    const SizedBox(height: 150),
-                    Container(
-                      width: double.infinity,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(50),
-                          topRight: Radius.circular(50),
-                        ),
-                      ),
-                      // Pass the model deeper into the layout hierarchy
-                      child: DestinationInfoSheet(destination: destination), 
+                child: Container(
+                  width: double.infinity,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(50),
+                      topRight: Radius.circular(50),
                     ),
-                  ],
+                  ),
+                  
+                  // 💡 THE MAGIC: ClipRRect forces the scrolling text to respect the rounded corners!
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(50),
+                      topRight: Radius.circular(50),
+                    ),
+                    
+                    // 💡 The ListView is now INSIDE the stationary container
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      children: [
+                        DestinationInfoSheet(destination: destination), 
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -451,6 +540,7 @@ class DestinationDetailScreen extends StatelessWidget {
 // =====================================================================
 // DETAIL SCREEN - TEXT DATA COMPONENT
 // =====================================================================
+
 class DestinationInfoSheet extends StatelessWidget {
   final Destination destination;
 
@@ -466,34 +556,78 @@ class DestinationInfoSheet extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(destination.cityName, style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
-              Text(destination.rating, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
+              Text(
+                destination.cityName,
+                style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                destination.rating,
+                style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+              ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 5),
+          
+          // Subtitle Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(destination.countryName, style: const TextStyle(color: Colors.grey, fontSize: 16)),
-              Text(destination.reviewCount, style: const TextStyle(color: Colors.grey, fontSize: 14)),
+              Text(
+                destination.countryName,
+                style: const TextStyle(color: Colors.grey, fontSize: 16),
+              ),
+              Text(
+                destination.reviewCount,
+                style: const TextStyle(color: Colors.grey, fontSize: 14),
+              ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 15),
+          
+          // Description
           Text(
             destination.description,
             style: const TextStyle(fontSize: 16, height: 1.5),
           ),
-          const SizedBox(height: 8),
-          const Text('Read more', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, decoration: TextDecoration.underline)),
-          const SizedBox(height: 32),
-          const Text('Upcoming tours', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 16),
+          const SizedBox(height: 2.5),
+
+          const Text(
+            'Read more',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              decoration: TextDecoration.underline,
+            ),
+          ),
+          const SizedBox(height: 25),
           
-          UpcomingToursList(destination: destination), 
+          // Upcoming Tours
+          const Text(
+            'Upcoming tours',
+            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 15),
+
+          UpcomingToursList(destination: destination),
+          const SizedBox(height: 25),
+          
+          // Maps Component
+          const Text(
+            'Location',
+            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 15),
+
+          SizedBox(
+            height: 250, 
+            width: double.infinity,
+            child: destination.mapScreen, 
+          ),
         ],
       ),
     );
@@ -503,6 +637,7 @@ class DestinationInfoSheet extends StatelessWidget {
 // =====================================================================
 // HORIZONTAL SCROLLING TOURS
 // =====================================================================
+
 class UpcomingToursList extends StatelessWidget {
   final Destination destination; 
 
@@ -514,11 +649,10 @@ class UpcomingToursList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 220,
+      height: 175,
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
-          // Render Dynamic Tour from the model
           TourCard(
             imageUrl: destination.imageUrl,
             title: destination.tourTitle,
@@ -526,7 +660,6 @@ class UpcomingToursList extends StatelessWidget {
             price: destination.tourPrice,
             person: destination.tourPersonText,
           ),
-          // Render Placeholders (In a real app, the Model would contain a List of Tours)
           TourCard(
             imageUrl: destination.imageUrl,
             title: destination.tourTitle,
@@ -550,6 +683,7 @@ class UpcomingToursList extends StatelessWidget {
 // =====================================================================
 // MINIATURE TOUR CARD 
 // =====================================================================
+
 class TourCard extends StatelessWidget {
   final String imageUrl;
   final String title;
@@ -569,11 +703,12 @@ class TourCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 170, // Fixed width prevents horizontal list views from throwing constraints errors
+      width: 170, // Fixed width prevents constraints errors
       margin: const EdgeInsets.only(right: 15),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Image Container
           Container(
             height: 120,
             width: double.infinity,
@@ -584,7 +719,6 @@ class TourCard extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             ),
-            // alignment efficiently places the child (action button) without needing Positioned
             alignment: Alignment.topRight, 
             padding: const EdgeInsets.all(8),
             child: Container(
@@ -597,6 +731,8 @@ class TourCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
+          
+          // Card Details
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -605,17 +741,30 @@ class TourCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // TextOverflow.ellipsis ensures long text gets '...' instead of wrapping or crashing
-                    Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14), maxLines: 1, overflow: TextOverflow.ellipsis),
-                    Text(duration, style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                    Text(
+                      title,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      duration,
+                      style: const TextStyle(color: Colors.grey, fontSize: 11),
+                    ),
                   ],
                 ),
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(price, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                  Text(person, style: const TextStyle(color: Colors.grey, fontSize: 9)),
+                  Text(
+                    price,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
+                  Text(
+                    person,
+                    style: const TextStyle(color: Colors.grey, fontSize: 9),
+                  ),
                 ],
               ),
             ],
@@ -629,32 +778,29 @@ class TourCard extends StatelessWidget {
 // =====================================================================
 // BOTTOM NAVIGATION BAR WITH CUSTOM INDICATOR
 // =====================================================================
-class NavigationExample extends StatefulWidget {
-  const NavigationExample({super.key});
+
+class CustomNavigationBar extends StatefulWidget {
+  const CustomNavigationBar({super.key});
 
   @override
-  State<NavigationExample> createState() => _NavigationExampleState();
+  State<CustomNavigationBar> createState() => _CustomNavigationBarState();
 }
 
-class _NavigationExampleState extends State<NavigationExample> {
+class _CustomNavigationBarState extends State<CustomNavigationBar> {
   int currentPageIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      // Padding pushes the bar away from the edges to make it float visually
       padding: const EdgeInsets.only(left: 30, right: 30, bottom: 25),
       child: ClipRRect(
         borderRadius: const BorderRadius.all(Radius.circular(50.0)),
         child: NavigationBar(
           height: 70,
           backgroundColor: Colors.white,
-          surfaceTintColor: Colors.transparent, // Prevents default Material purple/grey tinting
+          surfaceTintColor: Colors.transparent,
           labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-          
-          // 💡 TRICK: We make the default Material indicator invisible so we can provide our own custom circular shape
-          indicatorColor: Colors.transparent, 
-          
+          indicatorColor: Colors.transparent, // Custom circular shape instead
           onDestinationSelected: (int index) {
             setState(() {
               currentPageIndex = index;
@@ -664,9 +810,9 @@ class _NavigationExampleState extends State<NavigationExample> {
           destinations: <Widget>[
             NavigationDestination(
               icon: const Icon(Icons.home_outlined, size: 32.0, color: Colors.black),
-              // Our custom 55x55 circular indicator that shows when selected
               selectedIcon: Container(
-                width: 55, height: 55,
+                width: 55,
+                height: 55,
                 decoration: const BoxDecoration(color: Color(0xFFEE455D), shape: BoxShape.circle),
                 child: const Icon(Icons.home, size: 32.0, color: Colors.white),
               ),
@@ -675,7 +821,8 @@ class _NavigationExampleState extends State<NavigationExample> {
             NavigationDestination(
               icon: const Icon(Icons.calendar_today_outlined, size: 28.0, color: Colors.black),
               selectedIcon: Container(
-                width: 55, height: 55,
+                width: 55,
+                height: 55,
                 decoration: const BoxDecoration(color: Color(0xFFEE455D), shape: BoxShape.circle),
                 child: const Icon(Icons.calendar_today, size: 28.0, color: Colors.white),
               ),
@@ -684,7 +831,8 @@ class _NavigationExampleState extends State<NavigationExample> {
             NavigationDestination(
               icon: const Icon(Icons.favorite_border, size: 32.0, color: Colors.black),
               selectedIcon: Container(
-                width: 55, height: 55,
+                width: 55,
+                height: 55,
                 decoration: const BoxDecoration(color: Color(0xFFEE455D), shape: BoxShape.circle),
                 child: const Icon(Icons.favorite, size: 32.0, color: Colors.white),
               ),
@@ -693,7 +841,8 @@ class _NavigationExampleState extends State<NavigationExample> {
             NavigationDestination(
               icon: const Icon(Icons.grid_view_outlined, size: 32.0, color: Colors.black),
               selectedIcon: Container(
-                width: 55, height: 55,
+                width: 55,
+                height: 55,
                 decoration: const BoxDecoration(color: Color(0xFFEE455D), shape: BoxShape.circle),
                 child: const Icon(Icons.grid_view, size: 32.0, color: Colors.white),
               ),
@@ -709,8 +858,9 @@ class _NavigationExampleState extends State<NavigationExample> {
 // =====================================================================
 // TOP PROFILE HEADER
 // =====================================================================
-class CardExample extends StatelessWidget {
-  const CardExample({super.key});
+
+class ProfileHeader extends StatelessWidget {
+  const ProfileHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -719,8 +869,14 @@ class CardExample extends StatelessWidget {
       children: <Widget>[
         ListTile(
           leading: const Icon(Icons.account_circle, size: 40),
-          title: const Text('Hello, Beatrice', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-          subtitle: const Text('Welcome to TripGlide', style: TextStyle(color: Colors.grey)),
+          title: const Text(
+            'Hello, Beatrice',
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          ),
+          subtitle: const Text(
+            'Welcome to TripGlide',
+            style: TextStyle(color: Colors.grey),
+          ),
           trailing: FloatingActionButton.small(
             onPressed: () {},
             backgroundColor: Colors.white,
@@ -736,19 +892,20 @@ class CardExample extends StatelessWidget {
 // =====================================================================
 // GENERIC SEARCH BAR WIDGET
 // =====================================================================
-class SearchBarApp extends StatefulWidget {
-  const SearchBarApp({super.key});
+
+class SearchBarWidget extends StatefulWidget {
+  const SearchBarWidget({super.key});
 
   @override
-  State<SearchBarApp> createState() => _SearchBarAppState();
+  State<SearchBarWidget> createState() => _SearchBarWidgetState();
 }
 
-class _SearchBarAppState extends State<SearchBarApp> {
+class _SearchBarWidgetState extends State<SearchBarWidget> {
   @override
   Widget build(BuildContext context) {
     return SearchBar(
       hintText: 'Search...',
-      elevation: WidgetStateProperty.all(0), // Removes drop shadow for a flatter look
+      elevation: WidgetStateProperty.all(0),
       backgroundColor: WidgetStateProperty.all(Colors.white),
       leading: const Icon(Icons.search),
       onSubmitted: (String value) {},
@@ -758,6 +915,55 @@ class _SearchBarAppState extends State<SearchBarApp> {
           onPressed: () {},
         ),
       ],
+    );
+  }
+}
+
+// =====================================================================
+// REUSABLE MAP SCREEN
+// =====================================================================
+
+class MapScreen extends StatelessWidget {
+  final String idMap;
+  final String markLocation;
+  final String titlePlace;
+  final String snippetData;
+  final double lati;
+  final double lngi;
+  
+  const MapScreen({
+    super.key,
+    required this.idMap,
+    required this.markLocation,
+    required this.titlePlace,
+    required this.snippetData,
+    required this.lati,
+    required this.lngi,
+  });
+
+  LatLng get myTargetLocation => LatLng(lati, lngi);
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10.0),
+      child: GoogleMap(
+        key: ValueKey(idMap), 
+        initialCameraPosition: CameraPosition(
+          target: myTargetLocation,
+          zoom: 15.0,
+        ),
+        markers: {
+          Marker(
+            markerId: MarkerId(markLocation),
+            position: myTargetLocation,
+            infoWindow: InfoWindow(
+              title: titlePlace,
+              snippet: snippetData,
+            ),
+          ),
+        },
+      ),
     );
   }
 }
