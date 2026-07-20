@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_map/flutter_map.dart'; // 💡 Modern Mapbox Tile Layer
+import 'package:latlong2/latlong.dart'; // 💡 Standard Coordinate System
 
 void main() {
   runApp(const MainApp());
@@ -174,17 +175,15 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  /// State variable tracking layout structure.
-  /// False = List View, True = Grid View.
   bool isGrid = false;
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      bottom: false, // Ensures the list scrolls *behind* the floating nav bar
+      bottom: false,
       child: Scaffold(
         backgroundColor: const Color(0xFFF8F9FA),
-        extendBody: true, // Allows background/content to flow under NavigationBar
+        extendBody: true,
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
           child: Column(
@@ -195,8 +194,6 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 15),
               const SearchBarWidget(),
               const SizedBox(height: 30),
-              
-              // --- Title & Layout Toggle Row ---
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,10 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              
               const SizedBox(height: 5),
-              
-              // --- Category Filters (Horizontal Scroll) ---
               SizedBox(
                 height: 50,
                 child: ListView(
@@ -255,10 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 15),
-              
-              // --- Dynamic Content Area ---
               Expanded(
                 child: isGrid 
                     ? const DestinationGridView()
@@ -304,11 +295,11 @@ class DestinationGridView extends StatelessWidget {
       primary: false,
       crossAxisSpacing: 10,
       mainAxisSpacing: 10,
-      crossAxisCount: 2, // Sets 2 items per row
+      crossAxisCount: 2,
       childAspectRatio: 0.85,
       children: myDestinations.map((destination) {
         return DestinationCard(
-          isGrid: true, // Tells the card to shrink its UI for the grid
+          isGrid: true,
           destination: destination,
           onTap: () {
             Navigator.push(
@@ -352,15 +343,12 @@ class DestinationCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         child: Stack(
           children: [
-            // 1. Background Image
             Image.network(
               destination.imageUrl,
               fit: BoxFit.cover,
               width: double.infinity,
               height: double.infinity,
             ),
-            
-            // 2. Ripple Effect Layer
             Positioned.fill(
               child: Material(
                 color: Colors.transparent, 
@@ -369,8 +357,6 @@ class DestinationCard extends StatelessWidget {
                 ),
               ),
             ),
-            
-            // 3. Top Right Action Button
             Positioned(
               top: 12,
               right: 12,
@@ -388,8 +374,6 @@ class DestinationCard extends StatelessWidget {
                 ),
               ),
             ),
-            
-            // 4. Country Text (Bottom Left)
             Positioned(
               bottom: 16,
               left: 16,
@@ -402,8 +386,6 @@ class DestinationCard extends StatelessWidget {
                 ),
               ),
             ),
-            
-            // 5. Price Text (Bottom Right)
             Positioned(
               bottom: 16,
               right: 16,
@@ -416,8 +398,6 @@ class DestinationCard extends StatelessWidget {
                 ),
               ),
             ),
-            
-            // 6. Duration Pill (Top Left)
             Positioned(
               top: 16,
               left: 16,
@@ -473,7 +453,6 @@ class DestinationDetailScreen extends StatelessWidget {
           ),
           child: Column(
             children: [
-              // --- FIXED APP BAR BUTTONS ---
               Padding(
                 padding: const EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0, bottom: 10.0),
                 child: Row(
@@ -496,11 +475,7 @@ class DestinationDetailScreen extends StatelessWidget {
                   ],
                 ),
               ),
-
-              // --- FIXED GAP TO SHOW THE BACKGROUND IMAGE ---
               const SizedBox(height: 150), 
-
-              // --- STATIONARY ROUNDED SHEET ---
               Expanded(
                 child: Container(
                   width: double.infinity,
@@ -511,15 +486,11 @@ class DestinationDetailScreen extends StatelessWidget {
                       topRight: Radius.circular(50),
                     ),
                   ),
-                  
-                  // 💡 THE MAGIC: ClipRRect forces the scrolling text to respect the rounded corners!
                   child: ClipRRect(
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(50),
                       topRight: Radius.circular(50),
                     ),
-                    
-                    // 💡 The ListView is now INSIDE the stationary container
                     child: ListView(
                       padding: EdgeInsets.zero,
                       children: [
@@ -556,7 +527,6 @@ class DestinationInfoSheet extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -572,8 +542,6 @@ class DestinationInfoSheet extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 5),
-          
-          // Subtitle Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -588,14 +556,11 @@ class DestinationInfoSheet extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 15),
-          
-          // Description
           Text(
             destination.description,
             style: const TextStyle(fontSize: 16, height: 1.5),
           ),
           const SizedBox(height: 2.5),
-
           const Text(
             'Read more',
             style: TextStyle(
@@ -605,24 +570,18 @@ class DestinationInfoSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 25),
-          
-          // Upcoming Tours
           const Text(
             'Upcoming tours',
             style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 15),
-
           UpcomingToursList(destination: destination),
           const SizedBox(height: 25),
-          
-          // Maps Component
           const Text(
             'Location',
             style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 15),
-
           SizedBox(
             height: 250, 
             width: double.infinity,
@@ -703,12 +662,11 @@ class TourCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 170, // Fixed width prevents constraints errors
+      width: 170, 
       margin: const EdgeInsets.only(right: 15),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Image Container
           Container(
             height: 120,
             width: double.infinity,
@@ -731,8 +689,6 @@ class TourCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          
-          // Card Details
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -800,7 +756,7 @@ class _CustomNavigationBarState extends State<CustomNavigationBar> {
           backgroundColor: Colors.white,
           surfaceTintColor: Colors.transparent,
           labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-          indicatorColor: Colors.transparent, // Custom circular shape instead
+          indicatorColor: Colors.transparent, 
           onDestinationSelected: (int index) {
             setState(() {
               currentPageIndex = index;
@@ -920,7 +876,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
 }
 
 // =====================================================================
-// REUSABLE MAP SCREEN
+// REUSABLE MAP SCREEN (POWERED BY MAPBOX TILES)
 // =====================================================================
 
 class MapScreen extends StatelessWidget {
@@ -941,28 +897,40 @@ class MapScreen extends StatelessWidget {
     required this.lngi,
   });
 
-  LatLng get myTargetLocation => LatLng(lati, lngi);
-
   @override
   Widget build(BuildContext context) {
+    final position = LatLng(lati, lngi);
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(10.0),
-      child: GoogleMap(
+      child: FlutterMap(
         key: ValueKey(idMap), 
-        initialCameraPosition: CameraPosition(
-          target: myTargetLocation,
-          zoom: 15.0,
+        options: MapOptions(
+          initialCenter: position,
+          initialZoom: 12.0,
         ),
-        markers: {
-          Marker(
-            markerId: MarkerId(markLocation),
-            position: myTargetLocation,
-            infoWindow: InfoWindow(
-              title: titlePlace,
-              snippet: snippetData,
-            ),
+        children: [
+          // This layer streams the beautiful "Outdoors" map graphics straight from Mapbox!
+          TileLayer(
+            urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYWFkYW0tbWFzIiwiYSI6ImNtcnN2d2NxNDBtMmIyeHNnbXRuMjFqNTUifQ.Sl9MzXttgIOdYalTUzNL9A',
+            userAgentPackageName: 'com.example.lorem',
           ),
-        },
+          // This layer drops a clean Material design pin right onto your destination coordinates
+          MarkerLayer(
+            markers: [
+              Marker(
+                point: position,
+                width: 40,
+                height: 40,
+                child: const Icon(
+                  Icons.location_on,
+                  color: Colors.red,
+                  size: 40,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
