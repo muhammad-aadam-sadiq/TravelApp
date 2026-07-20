@@ -924,7 +924,7 @@ class MapScreen extends StatelessWidget {
                 height: 40,
                 child: const Icon(
                   Icons.location_on,
-                  color: Colors.red,
+                  color: Colors.black,
                   size: 40,
                 ),
               ),
