@@ -912,7 +912,7 @@ class MapScreen extends StatelessWidget {
         children: [
           // This layer streams the beautiful "Outdoors" map graphics straight from Mapbox!
           TileLayer(
-            urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYWFkYW0tbWFzIiwiYSI6ImNtcnN2d2NxNDBtMmIyeHNnbXRuMjFqNTUifQ.Sl9MzXttgIOdYalTUzNL9A',
+            urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/tiles/{z}/{x}/{y}?access_token=YOUR_MAPBOX_PUBLIC_TOKEN',
             userAgentPackageName: 'com.example.lorem',
           ),
           // This layer drops a clean Material design pin right onto your destination coordinates
