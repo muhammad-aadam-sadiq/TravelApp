@@ -1,17 +1,94 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart'; // 💡 Modern Mapbox Tile Layer
-import 'package:latlong2/latlong.dart'; // 💡 Standard Coordinate System
+import 'package:flutter_map/flutter_map.dart'; 
+import 'package:latlong2/latlong.dart'; 
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart' hide context;
+import 'dart:async';
 
-void main() {
+// =====================================================================
+// TOP-LEVEL DATABASE & FUNCTIONS (The "Dog" Tutorial Pattern)
+// =====================================================================
+late Future<Database> database;
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  database = openDatabase(
+    join(await getDatabasesPath(), 'travelapp.db'),
+    onCreate: (db, version) {
+      return db.execute(
+        'CREATE TABLE favorites(id TEXT PRIMARY KEY, name TEXT, location TEXT, imageUrl TEXT, price TEXT)',
+      );
+    },
+    version: 1,
+  );
+
   runApp(const MainApp());
 }
 
+class Favorite {
+  final String id;
+  final String name;
+  final String location;
+  final String imageUrl;
+  final String price;
+
+  Favorite({
+    required this.id, 
+    required this.name, 
+    required this.location, 
+    required this.imageUrl, 
+    required this.price
+  });
+
+  Map<String, Object?> toMap() {
+    return {
+      'id': id, 
+      'name': name, 
+      'location': location, 
+      'imageUrl': imageUrl, 
+      'price': price
+    };
+  }
+}
+
+Future<void> insertFavorite(Favorite fav) async {
+  final db = await database;
+  await db.insert('favorites', fav.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+}
+
+Future<List<Favorite>> getFavoritesList() async {
+  final db = await database;
+  final List<Map<String, Object?>> favMaps = await db.query('favorites');
+  return [
+    for (final {
+          'id': id as String, 
+          'name': name as String, 
+          'location': location as String, 
+          'imageUrl': imageUrl as String, 
+          'price': price as String
+        } in favMaps)
+      Favorite(id: id, name: name, location: location, imageUrl: imageUrl, price: price),
+  ];
+}
+
+Future<void> deleteFavorite(String id) async {
+  final db = await database;
+  await db.delete('favorites', where: 'id = ?', whereArgs: [id]);
+}
+
+Future<bool> checkIsFavorite(String id) async {
+  final db = await database;
+  final maps = await db.query('favorites', where: 'id = ?', whereArgs: [id]);
+  return maps.isNotEmpty;
+}
+
 // =====================================================================
-// DATA MODEL
+// DATA MODEL (Kept exactly as you had it)
 // =====================================================================
 
-/// A container to bundle all related information for a single destination.
 class Destination {
+  final bool favourite;
   final String imageUrl;
   final String cityName;
   final String countryName;
@@ -25,6 +102,7 @@ class Destination {
   final MapScreen mapScreen;
 
   const Destination({
+    required this.favourite,
     required this.imageUrl,
     required this.cityName,
     required this.countryName,
@@ -37,15 +115,24 @@ class Destination {
     required this.tourPersonText,
     required this.mapScreen,
   });
+
+  Map<String, Object?> toMap() {
+    return {'name': cityName, 'fav': favourite};
+  }
+
+  @override
+  String toString() {
+    return 'travelapp{name: $cityName, fav: $favourite}';
+  }
 }
 
 // =====================================================================
-// MOCK DATABASE
+// MOCK DATABASE (All 5 of your original destinations kept intact)
 // =====================================================================
 
-/// A hardcoded list of Destination objects simulating a database/API response.
 final List<Destination> myDestinations = [
   const Destination(
+    favourite: false,
     imageUrl: 'https://ik.imagekit.io/travalot/development/resources/attachments/2025/11/12/8fbd8b80-d71e-11f0-b871-9729adfa2385.jpg?tr=w-1600,h-1067,c-at_max:f-webp:q-85',
     cityName: 'Reykjavik',
     countryName: 'Iceland',
@@ -57,15 +144,11 @@ final List<Destination> myDestinations = [
     tourPrice: '\$630',
     tourPersonText: 'for 1 Person',
     mapScreen: MapScreen(
-      idMap: "map_reykjavik",
-      markLocation: "pin_reykjavik",
-      titlePlace: "Reykjavik",
-      snippetData: "Fire & Ice Trip",
-      lati: 64.1466,
-      lngi: -21.9426,
+      idMap: "map_reykjavik", markLocation: "pin_reykjavik", titlePlace: "Reykjavik", snippetData: "Fire & Ice Trip", lati: 64.1466, lngi: -21.9426,
     ),
   ),
   const Destination(
+    favourite: false,
     imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSABBDxMTS6VuQiuWr5HSiJBSd4B_IpvBoBqxS0Bes90zbm_tm3gJxnOVc&s=10',
     cityName: 'Highlands',
     countryName: 'Scotland',
@@ -77,15 +160,11 @@ final List<Destination> myDestinations = [
     tourPrice: '\$250',
     tourPersonText: 'for 1 Person',
     mapScreen: MapScreen(
-      idMap: "map_lochness",
-      markLocation: "pin_lochness",
-      titlePlace: "Loch Ness, Highlands",
-      snippetData: "Scottish Highlands",
-      lati: 57.3229,
-      lngi: -4.4244,
+      idMap: "map_lochness", markLocation: "pin_lochness", titlePlace: "Loch Ness, Highlands", snippetData: "Scottish Highlands", lati: 57.3229, lngi: -4.4244,
     ),
   ),
   const Destination(
+    favourite: false,
     imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTEdMuu_LkD2i4gUS_wIvlVbRTetmC7lKTQ1rZl-QdVQ&s=10',
     cityName: 'Hunza Valley',
     countryName: 'Gilgit Baltistan',
@@ -97,15 +176,11 @@ final List<Destination> myDestinations = [
     tourPrice: '\$450',
     tourPersonText: 'for 1 Person',
     mapScreen: MapScreen(
-      idMap: "map_hunza",
-      markLocation: "pin_hunza",
-      titlePlace: "Hunza Valley",
-      snippetData: "Gilgit Baltistan",
-      lati: 36.3167,
-      lngi: 74.6500,
+      idMap: "map_hunza", markLocation: "pin_hunza", titlePlace: "Hunza Valley", snippetData: "Gilgit Baltistan", lati: 36.3167, lngi: 74.6500,
     ),
   ),
   const Destination(
+    favourite: false,
     imageUrl: 'https://cdn.kimkim.com/files/a/content_articles/featured_photos/a1317e3c775ca06fb05848852ba24b5d4344ee6a/big-45c4c417598f0104f1d4c7262dedf921.jpg',
     cityName: 'Bagan',
     countryName: 'Myanmar',
@@ -117,15 +192,11 @@ final List<Destination> myDestinations = [
     tourPrice: '\$350',
     tourPersonText: 'for 1 Person',
     mapScreen: MapScreen(
-      idMap: "map_bagan",
-      markLocation: "pin_bagan",
-      titlePlace: "Bagan Temples",
-      snippetData: "Ancient City",
-      lati: 21.1717,
-      lngi: 94.8661,
+      idMap: "map_bagan", markLocation: "pin_bagan", titlePlace: "Bagan Temples", snippetData: "Ancient City", lati: 21.1717, lngi: 94.8661,
     ),
   ),
   const Destination(
+    favourite: false,
     imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRADpXUik5v4_oyeJPbggxSg7YhVuyuXeJc7pMxAdZsCdwkoT4xuhmGSBRQ&s=10',
     cityName: 'Queenstown',
     countryName: 'New Zealand',
@@ -137,12 +208,7 @@ final List<Destination> myDestinations = [
     tourPrice: '\$900',
     tourPersonText: 'for 1 Person',
     mapScreen: MapScreen(
-      idMap: "map_queenstown",
-      markLocation: "pin_queenstown",
-      titlePlace: "Queenstown",
-      snippetData: "Adventure Capital",
-      lati: -45.0312,
-      lngi: 168.6626,
+      idMap: "map_queenstown", markLocation: "pin_queenstown", titlePlace: "Queenstown", snippetData: "Adventure Capital", lati: -45.0312, lngi: 168.6626,
     ),
   ),
 ];
@@ -164,7 +230,7 @@ class MainApp extends StatelessWidget {
 }
 
 // =====================================================================
-// HOME SCREEN
+// HOME SCREEN (Updated to support bottom nav routing)
 // =====================================================================
 
 class HomeScreen extends StatefulWidget {
@@ -176,6 +242,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool isGrid = false;
+  int _currentIndex = 0; // Tracks which tab is selected
 
   @override
   Widget build(BuildContext context) {
@@ -184,98 +251,191 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
         backgroundColor: const Color(0xFFF8F9FA),
         extendBody: true,
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+        // Shows Favorites if Heart (index 2) is tapped, otherwise shows the Home feed
+        body: _currentIndex == 2 ? const FavoritesScreen() : _buildHomeFeed(),
+        bottomNavigationBar: CustomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+        ),
+      ),
+    );
+  }
+
+  // Your original UI exactly as it was
+  Widget _buildHomeFeed() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const SizedBox(height: 15),
+          const ProfileHeader(),
+          const SizedBox(height: 15),
+          const SearchBarWidget(),
+          const SizedBox(height: 30),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 15),
-              const ProfileHeader(),
-              const SizedBox(height: 15),
-              const SearchBarWidget(),
-              const SizedBox(height: 30),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Select your next trip',
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  FilledButton(
-                    onPressed: () {
-                      setState(() {
-                        isGrid = !isGrid;
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      shape: const CircleBorder(),
-                      padding: const EdgeInsets.all(8),
-                      backgroundColor: Colors.black,
-                    ),
-                    child: Icon(isGrid ? Icons.list : Icons.grid_view),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 5),
-              SizedBox(
-                height: 50,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: const [
-                    TextButton(
-                      onPressed: null,
-                      child: Text('South America', style: TextStyle(color: Colors.black)),
-                    ),
-                    TextButton(
-                      onPressed: null,
-                      child: Text('North America', style: TextStyle(color: Colors.grey)),
-                    ),
-                    TextButton(
-                      onPressed: null,
-                      child: Text('Asia', style: TextStyle(color: Colors.grey)),
-                    ),
-                    TextButton(
-                      onPressed: null,
-                      child: Text('Europe', style: TextStyle(color: Colors.grey)),
-                    ),
-                    TextButton(
-                      onPressed: null,
-                      child: Text('Africa', style: TextStyle(color: Colors.grey)),
-                    ),
-                  ],
+              const Text(
+                'Select your next trip',
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 15),
-              Expanded(
-                child: isGrid 
-                    ? const DestinationGridView()
-                    : ListView(
-                        padding: const EdgeInsets.only(bottom: 120, top: 16),
-                        children: myDestinations.map((destination) {
-                          return DestinationCard(
-                            destination: destination,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => DestinationDetailScreen(
-                                    destination: destination,
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        }).toList(),
-                      ),
+              FilledButton(
+                onPressed: () {
+                  setState(() {
+                    isGrid = !isGrid;
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  shape: const CircleBorder(),
+                  padding: const EdgeInsets.all(8),
+                  backgroundColor: Colors.black,
+                ),
+                child: Icon(isGrid ? Icons.list : Icons.grid_view),
               ),
             ],
           ),
-        ),
-        bottomNavigationBar: const CustomNavigationBar(),
+          const SizedBox(height: 5),
+          SizedBox(
+            height: 50,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: const [
+                TextButton(
+                  onPressed: null,
+                  child: Text('South America', style: TextStyle(color: Colors.black)),
+                ),
+                TextButton(
+                  onPressed: null,
+                  child: Text('North America', style: TextStyle(color: Colors.grey)),
+                ),
+                TextButton(
+                  onPressed: null,
+                  child: Text('Asia', style: TextStyle(color: Colors.grey)),
+                ),
+                TextButton(
+                  onPressed: null,
+                  child: Text('Europe', style: TextStyle(color: Colors.grey)),
+                ),
+                TextButton(
+                  onPressed: null,
+                  child: Text('Africa', style: TextStyle(color: Colors.grey)),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 15),
+          Expanded(
+            child: isGrid 
+                ? const DestinationGridView()
+                : ListView(
+                    padding: const EdgeInsets.only(bottom: 120, top: 16),
+                    children: myDestinations.map((destination) {
+                      return DestinationCard(
+                        destination: destination,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DestinationDetailScreen(
+                                destination: destination,
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    }).toList(),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// =====================================================================
+// FAVORITES SCREEN (New Screen to list the favorites)
+// =====================================================================
+
+class FavoritesScreen extends StatefulWidget {
+  const FavoritesScreen({super.key});
+
+  @override
+  State<FavoritesScreen> createState() => _FavoritesScreenState();
+}
+
+class _FavoritesScreenState extends State<FavoritesScreen> {
+  late Future<List<Favorite>> _favoritesList;
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshFavorites();
+  }
+
+  void _refreshFavorites() {
+    setState(() {
+      _favoritesList = getFavoritesList();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 30),
+          const Text('Saved Trips', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 20),
+          Expanded(
+            child: FutureBuilder<List<Favorite>>(
+              future: _favoritesList,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+                if (!snapshot.hasData || snapshot.data!.isEmpty) return const Center(child: Text('No favorites yet!'));
+
+                final favorites = snapshot.data!;
+
+                return ListView.builder(
+                  padding: const EdgeInsets.only(bottom: 120),
+                  itemCount: favorites.length,
+                  itemBuilder: (context, index) {
+                    final item = favorites[index];
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 15),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.all(10),
+                        leading: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.network(item.imageUrl, width: 70, height: 70, fit: BoxFit.cover),
+                        ),
+                        title: Text(item.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Text(item.location),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.favorite, color: Colors.red),
+                          onPressed: () async {
+                            await deleteFavorite(item.id);
+                            _refreshFavorites();
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -425,16 +585,54 @@ class DestinationCard extends StatelessWidget {
 }
 
 // =====================================================================
-// DESTINATION DETAIL SCREEN TEMPLATE
+// DESTINATION DETAIL SCREEN TEMPLATE (Updated to Stateful for SQLite)
 // =====================================================================
 
-class DestinationDetailScreen extends StatelessWidget {
+class DestinationDetailScreen extends StatefulWidget {
   final Destination destination;
 
   const DestinationDetailScreen({
     super.key,
     required this.destination,
   });
+
+  @override
+  State<DestinationDetailScreen> createState() => _DestinationDetailScreenState();
+}
+
+class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
+  bool _isFavorited = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkFavoriteStatus();
+  }
+
+  Future<void> _checkFavoriteStatus() async {
+    final status = await checkIsFavorite(widget.destination.cityName);
+    setState(() {
+      _isFavorited = status;
+    });
+  }
+
+  void _toggleFavorite() async {
+    if (_isFavorited) {
+      await deleteFavorite(widget.destination.cityName);
+    } else {
+      var fav = Favorite(
+        id: widget.destination.cityName,
+        name: widget.destination.cityName,
+        location: widget.destination.countryName,
+        imageUrl: widget.destination.imageUrl,
+        price: widget.destination.tourPrice,
+      );
+      await insertFavorite(fav);
+    }
+    setState(() {
+      _isFavorited = !_isFavorited;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -446,7 +644,7 @@ class DestinationDetailScreen extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             image: DecorationImage(
-              image: NetworkImage(destination.imageUrl), 
+              image: NetworkImage(widget.destination.imageUrl), 
               fit: BoxFit.fitWidth,
               alignment: Alignment.topCenter,
             ),
@@ -468,8 +666,11 @@ class DestinationDetailScreen extends StatelessWidget {
                     Container(
                       decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
                       child: IconButton(
-                        icon: const Icon(Icons.favorite_border, color: Colors.black),
-                        onPressed: () {},
+                        icon: Icon(
+                          _isFavorited ? Icons.favorite : Icons.favorite_border,
+                          color: _isFavorited ? Colors.red : Colors.black,
+                        ),
+                        onPressed: _toggleFavorite,
                       ),
                     ),
                   ],
@@ -494,7 +695,7 @@ class DestinationDetailScreen extends StatelessWidget {
                     child: ListView(
                       padding: EdgeInsets.zero,
                       children: [
-                        DestinationInfoSheet(destination: destination), 
+                        DestinationInfoSheet(destination: widget.destination), 
                       ],
                     ),
                   ),
@@ -732,18 +933,18 @@ class TourCard extends StatelessWidget {
 }
 
 // =====================================================================
-// BOTTOM NAVIGATION BAR WITH CUSTOM INDICATOR
+// BOTTOM NAVIGATION BAR (Updated to trigger screen changes)
 // =====================================================================
 
-class CustomNavigationBar extends StatefulWidget {
-  const CustomNavigationBar({super.key});
+class CustomNavigationBar extends StatelessWidget {
+  final int currentIndex;
+  final Function(int) onTap;
 
-  @override
-  State<CustomNavigationBar> createState() => _CustomNavigationBarState();
-}
-
-class _CustomNavigationBarState extends State<CustomNavigationBar> {
-  int currentPageIndex = 0;
+  const CustomNavigationBar({
+    super.key,
+    required this.currentIndex,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -757,12 +958,8 @@ class _CustomNavigationBarState extends State<CustomNavigationBar> {
           surfaceTintColor: Colors.transparent,
           labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
           indicatorColor: Colors.transparent, 
-          onDestinationSelected: (int index) {
-            setState(() {
-              currentPageIndex = index;
-            });
-          },
-          selectedIndex: currentPageIndex,
+          onDestinationSelected: onTap,
+          selectedIndex: currentIndex,
           destinations: <Widget>[
             NavigationDestination(
               icon: const Icon(Icons.home_outlined, size: 32.0, color: Colors.black),
@@ -910,12 +1107,10 @@ class MapScreen extends StatelessWidget {
           initialZoom: 12.0,
         ),
         children: [
-          // This layer streams the beautiful "Outdoors" map graphics straight from Mapbox!
           TileLayer(
             urlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/outdoors-v12/tiles/{z}/{x}/{y}?access_token=YOUR_MAPBOX_PUBLIC_TOKEN',
             userAgentPackageName: 'com.example.lorem',
           ),
-          // This layer drops a clean Material design pin right onto your destination coordinates
           MarkerLayer(
             markers: [
               Marker(
