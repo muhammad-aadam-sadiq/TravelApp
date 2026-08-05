@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "700124896834",
+    "project_id": "madlab-ronn-db",
+    "storage_bucket": "madlab-ronn-db.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:700124896834:android:756660f140a9e7c26197db",
+        "android_client_info": {
+          "package_name": "com.example.lorem"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCU8tPJ5sRe_yMeX_2C-A_ufZpYvqvgUu8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:700124896834:android:e9d7c4eb928b6d696197db",
+        "android_client_info": {
+          "package_name": "com.example.travel"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCU8tPJ5sRe_yMeX_2C-A_ufZpYvqvgUu8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
