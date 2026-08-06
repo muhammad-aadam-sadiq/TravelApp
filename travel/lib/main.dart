@@ -981,12 +981,25 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
   }
 
   // 🎮 CONTROLS: The synchronization logic between Local UI, Local DB, and Cloud DB.
+  // 🎮 CONTROLS: The synchronization logic between Local UI, Local DB, and Cloud DB.
   void _toggleFavorite() async {
-    // 💡 LOGIC: If true, the user wants to unfavorite. If false, the user wants to favorite.
-    if (_isFavorited) {
+    // 💡 LOGIC: Capture the current state BEFORE we change it
+    final wasFavorited = _isFavorited;
+
+    // 🔄 PROCESS: 1. INSTANT UI UPDATE! Flip the boolean visually instantly, 
+    // keeping the UI snappy regardless of DB response times.
+    setState(() {
+      _isFavorited = !wasFavorited;
+    });
+
+    // 🔄 PROCESS: 2. BACKGROUND DATABASE SYNC
+    // Because we update the UI first, the user doesn't feel the network delay!
+    if (wasFavorited) {
+      // User wanted to unfavorite
       await deleteFavorite(widget.destination.cityName); // Removes from offline SQLite
       await removeFavoriteFromFirestore(widget.destination.cityName); // Removes from online Firestore
     } else {
+      // User wanted to favorite
       var fav = Favorite(
         id: widget.destination.cityName,
         name: widget.destination.cityName,
@@ -997,11 +1010,6 @@ class _DestinationDetailScreenState extends State<DestinationDetailScreen> {
       await insertFavorite(fav); // Writes to offline SQLite
       await addFavoriteToFirestore(widget.destination); // Writes to online Firestore
     }
-    
-    // 🔄 PROCESS: Flips the boolean visually instantly, keeping the UI snappy regardless of DB response times.
-    setState(() {
-      _isFavorited = !_isFavorited;
-    });
   }
 
   @override
