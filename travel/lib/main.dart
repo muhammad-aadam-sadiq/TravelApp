@@ -1219,6 +1219,20 @@ class UpcomingToursList extends StatelessWidget {
             price: destination.tourPrice,
             person: destination.tourPersonText,
           ),
+          TourCard(
+            imageUrl: destination.imageUrl,
+            title: destination.tourTitle,
+            duration: destination.tourDuration,
+            price: destination.tourPrice,
+            person: destination.tourPersonText,
+          ),
+          TourCard(
+            imageUrl: destination.imageUrl,
+            title: destination.tourTitle,
+            duration: destination.tourDuration,
+            price: destination.tourPrice,
+            person: destination.tourPersonText,
+          ),
         ],
       ),
     );
